@@ -18,6 +18,10 @@ public class Game {
 		state = -1;
 	}
 	
+	public void connect() {
+		state = -1;
+	}
+	
 	public static void main(String[] args) {
 		new Gui();
 	}
