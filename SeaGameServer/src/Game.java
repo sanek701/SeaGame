@@ -1,26 +1,39 @@
+import java.util.Map;
+
 
 public class Game {
+	public enum State{NEW, CONNECTED}
 	
 	static int[] shipPower = {0, 0};
+	static Map<Integer, Game> games;
+	static int gameCount = 0;
 	
 	Client p1, p2;
 	String name;
+	State state = State.NEW;
 	int[][] field = new int[15][16];
 	int[][] attackers, defenders;
-	int state;
+	int id;
 	int ready = 0;
 	int order = 1;
 	
 	public Game(Client p, String pName, String gName) {
-		state = 0;
 		name = gName;
 		p1 = p;
 		p1.setPlayer(1, pName);
+		gameCount += 1;
+		id = gameCount;
+		games.put(id, this);
 	}
 	
-	public void join(Client p, String pName) {
+	public static void join(Client p, String pName, int gameId) {
+		games.get(gameId).addPlayer(p, pName);
+	}
+	
+	public void addPlayer(Client p, String pName) {
 		p2 = p;
 		p2.setPlayer(2, pName);
+		state = State.CONNECTED;
 	}
 	
 	public void setShip(Client p, int i, int j, int t) {

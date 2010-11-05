@@ -8,9 +8,12 @@ public class Client implements Runnable {
 	BufferedReader in;
 	PrintWriter out;
 	
+	public enum Command {BAD, NEW, JOIN}
+	
 	public int[] ShipCount = new int[10];
 	int playerNum;
 	String playerName;
+	Game game;
 	
 	public Client(Socket s) {
 		sock = s;
@@ -36,7 +39,7 @@ public class Client implements Runnable {
 	}
 	
 	public void write(String s) {
-		out.println(s);
+		out.println(s+"\n");
 	}
 	
 	public int y(int j) {
@@ -50,11 +53,32 @@ public class Client implements Runnable {
 	
 	public void run() {
 		String str;
+		String[] args;
+		Command cmd;
 		while(true) {
 			str = read();
 			if(str==null) break;
 			
-			write(str);
+			args = str.split(";");
+			cmd = Command.BAD;
+			try {
+				cmd = Enum.valueOf(Command.class, args[0]);
+			} catch(Exception e) {
+				//wrong cmd
+			}
+			
+			switch(cmd) {
+				case NEW:
+					write("NEW");
+					game = new Game(this, args[1], args[2]);
+					break;
+				case JOIN:
+					write("JOIN");
+					break;
+				case BAD:
+					write("BAD");
+					break;
+			}
 		}
 	}
 }
