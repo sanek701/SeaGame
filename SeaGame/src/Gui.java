@@ -15,6 +15,7 @@ public class Gui extends JFrame {
 	Gui mainFrm;
 	Game game = null;
 	Ship[][] field = new Ship[15][16];
+	String host=null, port=null;
 	
 	public Gui() {
 		super("Sea Game");
@@ -48,7 +49,7 @@ public class Gui extends JFrame {
 				ok.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e1) {
 						if(game!=null) game.exit();
-						game = new Game("a", "b", "c", "d", 0, mainFrm);
+						game = new Game("a", "b", getHost(), getPort(), 0, mainFrm);
 						newGameFrm.setVisible(false);
 					}
 				});
@@ -68,7 +69,7 @@ public class Gui extends JFrame {
 				ok.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e1) {
 						if(game!=null) game.exit();
-						//подключение к выбранной игре
+						game = new Game("Vasya", "", getHost(), getPort(), 1, mainFrm);
 						selectGameFrm.setVisible(false);
 					}
 				});
@@ -94,8 +95,8 @@ public class Gui extends JFrame {
 				setHostFrm = new JFrame("Настройки");
 				setHostFrm.setSize(200, 150);
 				setHostFrm.setLayout(new FlowLayout());
-				JTextField host = new JTextField("localhost", 15);
-				JTextField port = new JTextField("3002", 15);
+				JTextField host = new JTextField(getHost(), 15);
+				JTextField port = new JTextField(getPort(), 15);
 				JButton ok = new JButton("Подтвердить");
 				ok.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e1) {
@@ -115,4 +116,18 @@ public class Gui extends JFrame {
 		setVisible(true);
 	}
 	
+	private String getHost() {
+		if(host==null) {
+			//reading from file both host and port
+			//empty string if there is no file
+		}
+		return "localhost";
+	}
+	
+	private String getPort() {
+		if(port==null) {
+			//reading from file both host and port
+		}
+		return "3002";
+	}
 }

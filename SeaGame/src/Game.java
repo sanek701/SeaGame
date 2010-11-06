@@ -5,12 +5,12 @@ public class Game {
 	
 	public Game(String pName, String gName, String host, String port, int gameId, Gui g) {
 		state = 0;
-		gui = g ;
+		gui = g;
 		Connection srv = new Connection(host, port);
 		if(gameId==0) {
 			srv.newGame(pName, gName);
 		} else {
-			srv.joinGame(gameId, pName, gName);
+			srv.joinGame(gameId, pName);
 		}
 	}
 	
@@ -18,7 +18,7 @@ public class Game {
 		state = -1;
 	}
 	
-	public void connect() {
+	public void connect() { //??????
 		state = -1;
 	}
 	
