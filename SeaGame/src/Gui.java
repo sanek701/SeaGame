@@ -9,6 +9,12 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.IOException;
+
+//import java.io.FileWriter;
 
 public class Gui extends JFrame {
 	JFrame newGameFrm, selectGameFrm, setHostFrm;
@@ -93,22 +99,31 @@ public class Gui extends JFrame {
 		i5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setHostFrm = new JFrame("Настройки");
-				setHostFrm.setSize(200, 150);
+				setHostFrm.setSize(275, 120);
 				setHostFrm.setLayout(new FlowLayout());
-				JTextField host = new JTextField(getHost(), 15);
-				JTextField port = new JTextField(getPort(), 15);
+				final JTextField hostTextField = new JTextField(getHost(), 17);
+				final JTextField portTextField = new JTextField(getPort(), 17);
 				JButton ok = new JButton("Подтвердить");
+				JButton cansel = new JButton("Отменить");
+				
 				ok.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e1) {
-						//сохранить настройки
-						newGameFrm.setVisible(false);
+						saveChanges(hostTextField.getText(),portTextField.getText());
+						setHostFrm.setVisible(false);
 					}
 				});
+				cansel.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e1) {
+						setHostFrm.setVisible(false);
+					}
+				});
+				
 				setHostFrm.add(new JLabel("Хост"));
-				setHostFrm.add(host);
+				setHostFrm.add(hostTextField);
 				setHostFrm.add(new JLabel("Порт"));
-				setHostFrm.add(port);
+				setHostFrm.add(portTextField);
 				setHostFrm.add(ok);
+				setHostFrm.add(cansel);
 				setHostFrm.setVisible(true);
 			}
 		});
@@ -116,18 +131,48 @@ public class Gui extends JFrame {
 		setVisible(true);
 	}
 	
+	private void saveChanges(String hostNew, String portNew){
+		hostNew+="\n";
+		portNew+="\n";
+		try {
+			 FileWriter fw=new FileWriter("settings.txt");
+			 fw.write(hostNew);
+			 fw.write(portNew);
+			 fw.close();
+			 host=hostNew;
+			 port=portNew;
+		} catch(IOException exc) {}
+	}
+		
 	private String getHost() {
+		String strport;
+		
 		if(host==null) {
-			//reading from file both host and port
-			//empty string if there is no file
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader("settings.txt"));
+				host = reader.readLine();
+				strport = reader.readLine();
+				reader.close();
+			} catch(IOException exc) {
+				host="";
+			}
 		}
-		return "localhost";
+		return host;
 	}
 	
 	private String getPort() {
+		String strhost;
+		
 		if(port==null) {
-			//reading from file both host and port
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader("settings.txt"));
+				strhost = reader.readLine();
+				port = reader.readLine();
+				reader.close();
+			} catch(IOException exc) {
+				port="";
+			}
 		}
-		return "3002";
+		return port;
 	}
 }
