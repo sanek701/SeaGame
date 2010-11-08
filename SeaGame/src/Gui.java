@@ -14,8 +14,6 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
 
-//import java.io.FileWriter;
-
 public class Gui extends JFrame {
 	JFrame newGameFrm, selectGameFrm, setHostFrm;
 	Gui mainFrm;
