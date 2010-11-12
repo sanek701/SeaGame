@@ -6,6 +6,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
+
 
 public class Gui extends JFrame {
 	JFrame newGameFrm, selectGameFrm, setHostFrm;
@@ -127,6 +129,33 @@ public class Gui extends JFrame {
 		});
 		
 		setVisible(true);
+		
+		setImages();
+		createField();
+		repaint();
+	}
+	
+	public void createField() {
+		int i, j;
+		for(i=0; i<15; i++) {
+			for(j=0; j<16; j++) {
+				Ship t = new Ship(-1, i, j);
+				field[i][j] = t;
+				t.setBounds(j*36+30, i*54+16, 36, 54);
+				add(t);
+			}
+		}
+	}
+	
+	private void setImages(){
+		Image[] lib= new Image[12];
+		String fileName = "";
+		
+		for ( int i = 0 ; i < 12 ; i++ ){
+			fileName = "../images/" + Integer.toString(i) + ".jpg";
+			lib[i]=this.getToolkit().getImage(fileName);
+		}
+		Ship.lib=lib;
 	}
 	
 	private void saveChanges(String hostNew, String portNew){
