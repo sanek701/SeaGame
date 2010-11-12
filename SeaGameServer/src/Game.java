@@ -1,11 +1,10 @@
-import java.util.Map;
-
+import java.util.HashMap;
 
 public class Game {
 	public enum State{NEW, CONNECTED}
 	
 	static int[] shipPower = {0, 0};
-	static Map<Integer, Game> games;
+	static HashMap<Integer, Game> games = new HashMap<Integer, Game>();
 	static int gameCount = 0;
 	
 	Client p1, p2;

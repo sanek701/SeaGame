@@ -50,16 +50,20 @@ public class Gui extends JFrame {
 				newGameFrm.setSize(400, 300);
 				newGameFrm.setLayout(new FlowLayout());
 				newGameFrm.add(new JLabel("Название Игры"));
-				JTextField name = new JTextField("Моя игра", 32);
+				final JTextField gName = new JTextField("Моя игра", 32);
+				newGameFrm.add(gName);
+				newGameFrm.add(new JLabel("Имя Игрока"));
+				final JTextField pName = new JTextField("Вася", 32);
+				newGameFrm.add(pName);
 				JButton ok = new JButton("Создать");
 				ok.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e1) {
 						if(game!=null) game.exit();
-						game = new Game("a", "b", getHost(), getPort(), 0, mainFrm);
+						game = new Game(pName.getText(), gName.getText(), getHost(), getPort(), 0, mainFrm);
 						newGameFrm.setVisible(false);
 					}
 				});
-				newGameFrm.add(name);
+				
 				newGameFrm.add(ok);
 				newGameFrm.setVisible(true);
 			}
@@ -67,6 +71,8 @@ public class Gui extends JFrame {
 		
 		i2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String[][] gameList = null;
+				
 				selectGameFrm = new JFrame("Выбор Игры");
 				selectGameFrm.setSize(400, 300);
 				selectGameFrm.setLayout(new FlowLayout());
@@ -128,11 +134,9 @@ public class Gui extends JFrame {
 			}
 		});
 		
-		setVisible(true);
-		
-		setImages();
+		importImages();
 		createField();
-		repaint();
+		setVisible(true);
 	}
 	
 	public void createField() {
@@ -147,18 +151,18 @@ public class Gui extends JFrame {
 		}
 	}
 	
-	private void setImages(){
+	private void importImages() {
 		Image[] lib= new Image[12];
 		String fileName = "";
 		
-		for ( int i = 0 ; i < 12 ; i++ ){
+		for ( int i = 0 ; i < 12 ; i++ ) {
 			fileName = "../images/" + Integer.toString(i) + ".jpg";
 			lib[i]=this.getToolkit().getImage(fileName);
 		}
-		Ship.lib=lib;
+		Ship.setLib(lib);
 	}
 	
-	private void saveChanges(String hostNew, String portNew){
+	private void saveChanges(String hostNew, String portNew) {
 		hostNew+="\n";
 		portNew+="\n";
 		try {
@@ -181,7 +185,7 @@ public class Gui extends JFrame {
 				strport = reader.readLine();
 				reader.close();
 			} catch(IOException exc) {
-				host="";
+				host="localhost";
 			}
 		}
 		return host;
@@ -197,7 +201,7 @@ public class Gui extends JFrame {
 				port = reader.readLine();
 				reader.close();
 			} catch(IOException exc) {
-				port="";
+				port="3000";
 			}
 		}
 		return port;

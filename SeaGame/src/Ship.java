@@ -6,13 +6,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Ship extends JComponent {
-	static Game game;
+	static Game game = null;
+	static Image[] lib = null;
 	int x, y, type;
 	boolean selected, enemy;
-	public static Image[] lib = null;
 	String[] names = {"","Линкор","Крейсер", "Эсминец","Сторожевик",
 			"Торпедный катер", "Тральщик", "Подводная лодка",
 			"Форт", "Атомная бомба", "Торпеда", "Мина"};
+	enum Type {L, K, E, S, TK, TR, PL, F, A, T, M}
 	
 	public Ship(int t, int i, int j) {
 		x = i;
@@ -21,7 +22,10 @@ public class Ship extends JComponent {
 		
 		addMouseListener(new MouseAdapter( ) {
 			public void mousePressed(MouseEvent me) {
+				if(game==null) return;
+				switch(game.state) {
 				
+				}
 			}
 		});
 	}
@@ -46,5 +50,9 @@ public class Ship extends JComponent {
 
 	public static void setGame(Game g) {
 		game = g;
+	}
+	
+	public static void setLib(Image[] l) {
+		lib = l;
 	}
 }

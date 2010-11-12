@@ -70,6 +70,7 @@ public class Client implements Runnable {
 			switch(cmd) {
 				case NEW:
 					write("NEW");
+					if(args.length != 3) write("BAD");
 					game = new Game(this, args[1], args[2]);
 					break;
 				case JOIN:

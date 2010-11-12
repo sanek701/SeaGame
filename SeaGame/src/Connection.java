@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Connection implements Runnable {
-	public enum Command {NEW, JOIN}
+	public enum Command {BAD, NEW, GLIST, JOIN}
 	
 	Socket sock;
 	BufferedReader in;
@@ -32,8 +32,20 @@ public class Connection implements Runnable {
 	
 	public void run() {
 		String str;
+		String[] args;
+		Command cmd;
+
 		while(true) {
 			str = read();
+			if(str==null) break;
+			
+			args = str.split(";");
+			cmd = Command.BAD;
+			try {
+				cmd = Enum.valueOf(Command.class, args[0]);
+			} catch(Exception e) {
+				//wrong cmd
+			}
 		}
 	}
 	
@@ -45,12 +57,16 @@ public class Connection implements Runnable {
 			e.printStackTrace();
 			return null;
 		}
+		System.out.println("<- "+line); //debug
 		return line;
 	}
 	
 	private void request(Command cmd, String[] args) {
 		String s = cmd.toString()+";";
-		// join args with ';'
+		for(int i=0; i<args.length; i++)	// join args with ';'
+			s += args[i]+";";
+
+		System.out.println("-> "+s); //debug
 		out.println(s);
 	}
 }
