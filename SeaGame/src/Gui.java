@@ -164,7 +164,7 @@ public class Gui extends JFrame {
 	
 	private void saveChanges(String hostNew, String portNew) {
 		hostNew+="\n";
-		portNew+="\n";
+		//portNew+="\n";
 		try {
 			 FileWriter fw=new FileWriter("settings.txt");
 			 fw.write(hostNew);
