@@ -9,11 +9,14 @@ public class Ship extends JComponent {
 	static Game game = null;
 	static Image[] lib = null;
 	int x, y, type;
+	public static int sum;
 	boolean selected, enemy;
-	String[] names = {"","Линкор","Крейсер", "Эсминец","Сторожевик",
+	static String[] names = {"","Линкор","Крейсер", "Эсминец","Сторожевик",
 			"Торпедный катер", "Тральщик", "Подводная лодка",
 			"Форт", "Атомная бомба", "Торпеда", "Мина"};
 	enum Type {L, K, E, S, TK, TR, PL, F, A, T, M}
+	final static int[] normalCount = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
+	public static int[] count =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	
 	public Ship(int t, int i, int j) {
 		x = i;
@@ -24,7 +27,12 @@ public class Ship extends JComponent {
 			public void mousePressed(MouseEvent me) {
 				if(game==null) return;
 				switch(game.state) {
-				
+					case SCRT:
+						if(type==-1 && sum < 52) {
+							game.gui.showCreateShip(x, y);
+						} else if(type>0) { 
+							game.gui.showDeletShip(x, y);
+						}
 				}
 			}
 		});
@@ -47,7 +55,11 @@ public class Ship extends JComponent {
 		g.setColor(c);
 		super.paint(g);
 	}
-
+	
+	public void setType(int t){
+		type=t;
+	}
+	
 	public static void setGame(Game g) {
 		game = g;
 	}

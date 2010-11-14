@@ -5,11 +5,15 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.ButtonGroup;
+import javax.swing.BoxLayout;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.FileReader;
@@ -17,7 +21,7 @@ import java.io.IOException;
 
 
 public class Gui extends JFrame {
-	JFrame newGameFrm, selectGameFrm, setHostFrm;
+	JFrame newGameFrm, selectGameFrm, setHostFrm, createShipFrm, deletShipFrm;
 	Gui mainFrm;
 	Game game = null;
 	Ship[][] field = new Ship[15][16];
@@ -151,6 +155,65 @@ public class Gui extends JFrame {
 		}
 	}
 	
+	public void showCreateShip(int x, int y){
+		createShipFrm = new JFrame("Выберите Тип Корабля");
+		JRadioButton[] type = new JRadioButton[11];
+		ButtonGroup bg = new ButtonGroup();
+		createShipFrm.setLayout(new BoxLayout(createShipFrm.getContentPane(), BoxLayout.Y_AXIS));
+		createShipFrm.setBounds(200,200,250,270);
+			
+		final int p = x;
+		final int q = y;
+			
+		for(int i=1; i<=11; i++) {
+			if(Ship.count[i] == Ship.normalCount[i]) continue;
+			final int k = i;
+			type[i-1] = new JRadioButton(Ship.names[i]+"("+Ship.count[i]+"/"+Ship.normalCount[i]+")\n", false);
+			type[i-1].addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					createShipFrm.setVisible(false);
+					game.createShip(p, q, k);
+					mainFrm.repaint();
+				}
+			});
+			bg.add(type[i-1]);
+			type[i-1].setAlignmentX(Component.LEFT_ALIGNMENT);
+			createShipFrm.getContentPane().add(type[i-1]);
+		}
+
+			createShipFrm.setVisible(true);
+			
+	}
+	
+	public void showDeletShip(final int x,final int y){
+		deletShipFrm = new JFrame("Удаление");
+		
+		JButton ok= new JButton("Да");
+		JButton cansel= new JButton("Нет");
+		JLabel lab= new JLabel("Хотите удалить этот корабль?");
+		deletShipFrm.setBounds(400, 400, 240, 100);
+		deletShipFrm.setLayout(new FlowLayout());
+		
+		ok.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.deleteShip(x, y, field[x][y].type);
+				deletShipFrm.setVisible(false);
+				mainFrm.repaint();
+			}
+		});
+
+		cansel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				deletShipFrm.setVisible(false);
+			}
+		});			
+  
+		deletShipFrm.add(lab);
+		deletShipFrm.add(ok);
+		deletShipFrm.add(cansel);
+		deletShipFrm.setVisible(true);
+	}
+	
 	private void importImages() {
 		Image[] lib= new Image[12];
 		String fileName = "";
@@ -164,7 +227,6 @@ public class Gui extends JFrame {
 	
 	private void saveChanges(String hostNew, String portNew) {
 		hostNew+="\n";
-		//portNew+="\n";
 		try {
 			 FileWriter fw=new FileWriter("settings.txt");
 			 fw.write(hostNew);
