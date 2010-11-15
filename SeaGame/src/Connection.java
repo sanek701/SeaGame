@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Connection implements Runnable {
-	public enum Command {BAD, NEW, GLIST, JOIN}
+	public enum Command {BAD, NEW, JOIN}
 	
 	Socket sock;
 	BufferedReader in;
@@ -46,6 +46,9 @@ public class Connection implements Runnable {
 			} catch(Exception e) {
 				//wrong cmd
 			}
+			
+			switch(cmd) {
+			}
 		}
 	}
 	
@@ -68,5 +71,27 @@ public class Connection implements Runnable {
 
 		System.out.println("-> "+s); //debug
 		out.println(s);
+	}
+	
+	public static String[][] getGameList(String host, String port) {
+		Socket s = null;
+		BufferedReader inc = null;
+		PrintWriter outc = null;
+		String[] games = null;
+		
+		try {
+			s = new Socket(host, Integer.valueOf(port));
+			inc = new BufferedReader(new InputStreamReader(s.getInputStream()));
+			outc = new PrintWriter(s.getOutputStream(), true);
+			outc.println("GAMELIST;");
+			games = inc.readLine().split(",");
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			
+	        String[][] gameList = new String[games.length][2];
+	        for(int i=0; i<games.length; i++)
+	        	gameList[i] = games[i].split("-");
+	        return gameList;
 	}
 }

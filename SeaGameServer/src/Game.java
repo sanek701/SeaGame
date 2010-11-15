@@ -1,4 +1,7 @@
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Map;
 
 public class Game {
 	public enum State{NEW, CONNECTED}
@@ -59,6 +62,17 @@ public class Game {
 	
 	public void setDefenders(Client p, int[][] defenders) {
 		
+	}
+	
+	public static String gameList() {
+		Set s = games.entrySet();
+		String result = "";
+		Iterator i = s.iterator();
+		while(i.hasNext()) {
+			Map.Entry t = (Map.Entry)i.next();
+			result += t.getKey().toString()+"="+t.getValue().toString()+",";
+		}
+		return result;
 	}
 	
 	private Client opponent(Client p) {

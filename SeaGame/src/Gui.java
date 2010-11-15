@@ -21,11 +21,14 @@ import java.io.IOException;
 
 
 public class Gui extends JFrame {
-	JFrame newGameFrm, selectGameFrm, setHostFrm, createShipFrm, deletShipFrm;
+	JFrame newGameFrm, selectGameFrm, setHostFrm, createShipFrm=null, deleteShipFrm=null;
 	Gui mainFrm;
 	Game game = null;
 	Ship[][] field = new Ship[15][16];
 	String host=null, port=null;
+	static String[] shipNames = {"","Линкор","Крейсер", "Эсминец","Сторожевик",
+		"Торпедный катер", "Тральщик", "Подводная лодка",
+		"Форт", "Атомная бомба", "Торпеда", "Мина"};
 	
 	public Gui() {
 		super("Sea Game");
@@ -75,7 +78,7 @@ public class Gui extends JFrame {
 		
 		i2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[][] gameList = null;
+				String[][] gameList = Connection.getGameList(getHost(), getPort());
 				
 				selectGameFrm = new JFrame("Выбор Игры");
 				selectGameFrm.setSize(400, 300);
@@ -118,7 +121,7 @@ public class Gui extends JFrame {
 				
 				ok.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e1) {
-						saveChanges(hostTextField.getText(),portTextField.getText());
+						saveChanges(hostTextField.getText(), portTextField.getText());
 						setHostFrm.setVisible(false);
 					}
 				});
@@ -155,7 +158,8 @@ public class Gui extends JFrame {
 		}
 	}
 	
-	public void showCreateShip(int x, int y){
+	public void showCreateShip(int x, int y) {
+		if(createShipFrm != null) createShipFrm.setVisible(false);
 		createShipFrm = new JFrame("Выберите Тип Корабля");
 		JRadioButton[] type = new JRadioButton[11];
 		ButtonGroup bg = new ButtonGroup();
@@ -164,54 +168,53 @@ public class Gui extends JFrame {
 			
 		final int p = x;
 		final int q = y;
-			
+		int[] sCnt = game.shipCnt;
+		int[] nsCnt = Game.normalShipCnt;
+		
 		for(int i=1; i<=11; i++) {
-			if(Ship.count[i] == Ship.normalCount[i]) continue;
+			if(sCnt[i] == nsCnt[i]) continue;
 			final int k = i;
-			type[i-1] = new JRadioButton(Ship.names[i]+"("+Ship.count[i]+"/"+Ship.normalCount[i]+")\n", false);
+			type[i-1] = new JRadioButton(shipNames[i]+"("+sCnt[i]+"/"+nsCnt[i]+")\n", false);
 			type[i-1].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					createShipFrm.setVisible(false);
 					game.createShip(p, q, k);
-					mainFrm.repaint();
 				}
 			});
 			bg.add(type[i-1]);
 			type[i-1].setAlignmentX(Component.LEFT_ALIGNMENT);
 			createShipFrm.getContentPane().add(type[i-1]);
 		}
-
-			createShipFrm.setVisible(true);
-			
+		createShipFrm.setVisible(true);
 	}
 	
-	public void showDeletShip(final int x,final int y){
-		deletShipFrm = new JFrame("Удаление");
+	public void showDeleteShip(final int x,final int y){
+		if(deleteShipFrm != null) deleteShipFrm.setVisible(false);
+		deleteShipFrm = new JFrame("Удаление");
 		
 		JButton ok= new JButton("Да");
 		JButton cansel= new JButton("Нет");
 		JLabel lab= new JLabel("Хотите удалить этот корабль?");
-		deletShipFrm.setBounds(400, 400, 240, 100);
-		deletShipFrm.setLayout(new FlowLayout());
+		deleteShipFrm.setBounds(400, 400, 240, 100);
+		deleteShipFrm.setLayout(new FlowLayout());
 		
 		ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.deleteShip(x, y, field[x][y].type);
-				deletShipFrm.setVisible(false);
-				mainFrm.repaint();
+				deleteShipFrm.setVisible(false);
 			}
 		});
 
 		cansel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				deletShipFrm.setVisible(false);
+				deleteShipFrm.setVisible(false);
 			}
 		});			
   
-		deletShipFrm.add(lab);
-		deletShipFrm.add(ok);
-		deletShipFrm.add(cansel);
-		deletShipFrm.setVisible(true);
+		deleteShipFrm.add(lab);
+		deleteShipFrm.add(ok);
+		deleteShipFrm.add(cansel);
+		deleteShipFrm.setVisible(true);
 	}
 	
 	private void importImages() {
@@ -226,25 +229,23 @@ public class Gui extends JFrame {
 	}
 	
 	private void saveChanges(String hostNew, String portNew) {
-		hostNew+="\n";
+		host = hostNew;
+		port = portNew;
 		try {
-			 FileWriter fw=new FileWriter("settings.txt");
+			 hostNew += "\n";
+			 FileWriter fw = new FileWriter("settings.txt");
 			 fw.write(hostNew);
 			 fw.write(portNew);
 			 fw.close();
-			 host=hostNew;
-			 port=portNew;
 		} catch(IOException exc) {}
 	}
 		
 	private String getHost() {
-		String strport;
-		
 		if(host==null) {
 			try {
 				BufferedReader reader = new BufferedReader(new FileReader("settings.txt"));
 				host = reader.readLine();
-				strport = reader.readLine();
+				port = reader.readLine();
 				reader.close();
 			} catch(IOException exc) {
 				host="localhost";
@@ -254,12 +255,10 @@ public class Gui extends JFrame {
 	}
 	
 	private String getPort() {
-		String strhost;
-		
 		if(port==null) {
 			try {
 				BufferedReader reader = new BufferedReader(new FileReader("settings.txt"));
-				strhost = reader.readLine();
+				host = reader.readLine();
 				port = reader.readLine();
 				reader.close();
 			} catch(IOException exc) {

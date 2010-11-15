@@ -8,7 +8,7 @@ public class Client implements Runnable {
 	BufferedReader in;
 	PrintWriter out;
 	
-	public enum Command {BAD, NEW, JOIN}
+	public enum Command {BAD, NEW, JOIN, GAMELIST}
 	
 	public int[] ShipCount = new int[10];
 	int playerNum;
@@ -17,7 +17,7 @@ public class Client implements Runnable {
 	
 	public Client(Socket s) {
 		sock = s;
-		try{
+		try {
 			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			out = new PrintWriter(sock.getOutputStream(), true);
 		} catch(Exception e) {
@@ -68,6 +68,9 @@ public class Client implements Runnable {
 			}
 			
 			switch(cmd) {
+				case GAMELIST:
+					write(Game.gameList());
+					break;
 				case NEW:
 					write("NEW");
 					if(args.length != 3) write("BAD");

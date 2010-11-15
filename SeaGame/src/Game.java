@@ -1,8 +1,11 @@
 
 public class Game {
-	enum State {NEW, BAD, SCRT}
-	State state = State.NEW;
+	enum State {NEW, CREATESHIPS}
+	final static int[] normalShipCnt = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
+	int[] shipCnt =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int shipSum = 0;
 	Gui gui;
+	State state;
 	
 	public Game(String pName, String gName, String host, String port, int gameId, Gui g) {
 		gui = g;
@@ -10,7 +13,8 @@ public class Game {
 		Connection srv = new Connection(host, port);
 		if(gameId==0) {
 			srv.newGame(pName, gName);
-			state = State.SCRT;//test create Ship
+			//state = State.NEW;
+			state = State.CREATESHIPS;
 		} else {
 			srv.joinGame(gameId, pName);
 		}
@@ -19,20 +23,23 @@ public class Game {
 	public void exit() {
 	}
 	
-	public void createShip(int x, int y, int type){
-		Ship.count[type] += 1;
-		Ship.sum += 1;
-		gui.field[x][y].setType(type);
+	public void createShip(int x, int y, int type) {
+		shipCnt[type] += 1;
+		shipSum += 1;
+		setShip(x, y, type);
 	}
 	
-	public void deleteShip(int x, int y, int type){
-		Ship.count[type] -= 1;
-		Ship.sum -= 1;
-		gui.field[x][y].setType(-1);
+	public void deleteShip(int x, int y, int type) {
+		shipCnt[type] -= 1;
+		shipSum -= 1;
+		setShip(x, y, -1);
+	}
+	
+	private void setShip(int x, int y, int t) {
+		gui.field[x][y].setType(t);
 	}
 	
 	public static void main(String[] args) {
 		new Gui();
 	}
-
 }
