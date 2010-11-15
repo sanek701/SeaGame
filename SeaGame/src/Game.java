@@ -23,6 +23,9 @@ public class Game {
 	public void exit() {
 	}
 	
+	public void joinGame(int id, String plName){
+	}
+	
 	public void createShip(int x, int y, int type) {
 		shipCnt[type] += 1;
 		shipSum += 1;

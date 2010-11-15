@@ -53,47 +53,13 @@ public class Gui extends JFrame {
 		
 		i1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				newGameFrm = new JFrame("Создание Игры");
-				newGameFrm.setSize(400, 300);
-				newGameFrm.setLayout(new FlowLayout());
-				newGameFrm.add(new JLabel("Название Игры"));
-				final JTextField gName = new JTextField("Моя игра", 32);
-				newGameFrm.add(gName);
-				newGameFrm.add(new JLabel("Имя Игрока"));
-				final JTextField pName = new JTextField("Вася", 32);
-				newGameFrm.add(pName);
-				JButton ok = new JButton("Создать");
-				ok.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e1) {
-						if(game!=null) game.exit();
-						game = new Game(pName.getText(), gName.getText(), getHost(), getPort(), 0, mainFrm);
-						newGameFrm.setVisible(false);
-					}
-				});
-				
-				newGameFrm.add(ok);
-				newGameFrm.setVisible(true);
+				showCreateGame();
 			}
 		});
 		
 		i2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[][] gameList = Connection.getGameList(getHost(), getPort());
-				
-				selectGameFrm = new JFrame("Выбор Игры");
-				selectGameFrm.setSize(400, 300);
-				selectGameFrm.setLayout(new FlowLayout());
-				//Формируется список ожидающих игроков
-				JButton ok = new JButton("Подключиться");
-				ok.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e1) {
-						if(game!=null) game.exit();
-						game = new Game("Vasya", "", getHost(), getPort(), 1, mainFrm);
-						selectGameFrm.setVisible(false);
-					}
-				});
-				selectGameFrm.add(ok);
-				selectGameFrm.setVisible(true);
+				showGameList();
 			}
 		});
 		
@@ -228,6 +194,71 @@ public class Gui extends JFrame {
 		Ship.setLib(lib);
 	}
 	
+	private void showCreateGame(){
+		newGameFrm = new JFrame("Создание Игры");
+		newGameFrm.setSize(400, 300);
+		newGameFrm.setLayout(new FlowLayout());
+		newGameFrm.add(new JLabel("Название Игры"));
+		final JTextField gName = new JTextField("Моя игра", 32);
+		newGameFrm.add(gName);
+		newGameFrm.add(new JLabel("Имя Игрока"));
+		final JTextField pName = new JTextField("Вася", 32);
+		newGameFrm.add(pName);
+		JButton ok = new JButton("Создать");
+		ok.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				if(game!=null) game.exit();
+				game = new Game(pName.getText(), gName.getText(), getHost(), getPort(), 0, mainFrm);
+				newGameFrm.setVisible(false);
+			}
+		});
+		
+		newGameFrm.add(ok);
+		newGameFrm.setVisible(true);
+	}
+	
+	private void showGameList(){
+		final String[][] gameList = Connection.getGameList(getHost(), getPort());
+				
+		selectGameFrm = new JFrame("Выбор Игры");
+		selectGameFrm.setSize(400, 300);
+		selectGameFrm.setLayout(new FlowLayout());
+		
+		final JTextField playerNameFld = new JTextField("Игрок");
+		selectGameFrm.add(new JLabel("Ваше Имя"));
+		selectGameFrm.add(playerNameFld);
+		
+		JRadioButton[] rb = new JRadioButton[gameList.length];
+		ButtonGroup bg = new ButtonGroup();
+		selectGameFrm.setLayout(new BoxLayout(selectGameFrm.getContentPane(), BoxLayout.Y_AXIS));
+		
+		for(int i = 0; i < gameList.length; i++ ){
+			final int j = i;//добавить проверку на пустоту
+			rb[i]= new JRadioButton(gameList[i][1]+"\n", false);
+			rb[i].addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					selectGameFrm.setVisible(false);
+					game.joinGame(j,playerNameFld.getText());
+				}
+			});
+			bg.add(rb[i]);
+			rb[i].setAlignmentX(Component.LEFT_ALIGNMENT);
+			selectGameFrm.getContentPane().add(rb[i]);
+		}
+		
+		JButton newGame = new JButton("Создать Игру");
+		newGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				if(game!=null) game.exit();
+				showCreateGame();
+				selectGameFrm.setVisible(false);
+			}
+		});
+		selectGameFrm.add(newGame);
+		selectGameFrm.setVisible(true);
+		
+	}
+
 	private void saveChanges(String hostNew, String portNew) {
 		host = hostNew;
 		port = portNew;

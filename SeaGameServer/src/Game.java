@@ -11,7 +11,7 @@ public class Game {
 	static int gameCount = 0;
 	
 	Client p1, p2;
-	String name;
+	public String name;
 	State state = State.NEW;
 	int[][] field = new int[15][16];
 	int[][] attackers, defenders;
@@ -70,7 +70,7 @@ public class Game {
 		Iterator i = s.iterator();
 		while(i.hasNext()) {
 			Map.Entry t = (Map.Entry)i.next();
-			result += t.getKey().toString()+"="+t.getValue().toString()+",";
+			result += t.getKey().toString()+"-"+t.getValue().toString()+",";
 		}
 		return result;
 	}
