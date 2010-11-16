@@ -221,19 +221,20 @@ public class Gui extends JFrame {
 		final String[][] gameList = Connection.getGameList(getHost(), getPort());
 				
 		selectGameFrm = new JFrame("Выбор Игры");
-		selectGameFrm.setSize(400, 300);
+		selectGameFrm.setSize(400, 25*gameList.length+70);
 		selectGameFrm.setLayout(new FlowLayout());
 		
-		final JTextField playerNameFld = new JTextField("Игрок");
-		selectGameFrm.add(new JLabel("Ваше Имя"));
-		selectGameFrm.add(playerNameFld);
-		
+		final JTextField playerNameFld = new JTextField("Игрок", 17);
+		JLabel playerName = new JLabel("Ваше Имя");
 		JRadioButton[] rb = new JRadioButton[gameList.length];
-		ButtonGroup bg = new ButtonGroup();
+		final ButtonGroup bg = new ButtonGroup();
 		selectGameFrm.setLayout(new BoxLayout(selectGameFrm.getContentPane(), BoxLayout.Y_AXIS));
 		
+		selectGameFrm.getContentPane().add(playerName);
+		selectGameFrm.getContentPane().add(playerNameFld);
+		
 		for(int i = 0; i < gameList.length; i++ ){
-			final int j = i;//добавить проверку на пустоту
+			final int j = i;
 			rb[i]= new JRadioButton(gameList[i][1]+"\n", false);
 			rb[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -254,6 +255,8 @@ public class Gui extends JFrame {
 				selectGameFrm.setVisible(false);
 			}
 		});
+		
+		
 		selectGameFrm.add(newGame);
 		selectGameFrm.setVisible(true);
 		
