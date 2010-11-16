@@ -70,9 +70,13 @@ public class Game {
 		Iterator i = s.iterator();
 		while(i.hasNext()) {
 			Map.Entry t = (Map.Entry)i.next();
-			result += t.getKey().toString()+"-"+t.getValue().toString()+",";
+			result += t.getKey().toString()+"-"+((Game)t.getValue()).getName()+",";
 		}
 		return result;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	private Client opponent(Client p) {
