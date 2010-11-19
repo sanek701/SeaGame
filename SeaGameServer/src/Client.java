@@ -8,10 +8,11 @@ public class Client implements Runnable {
 	BufferedReader in;
 	PrintWriter out;
 	
-	public enum Command {BAD, NEW, JOIN, GAMELIST}
+	public enum Command {BAD, NEW, JOIN, GAMELIST, SET}
 	
 	public int[] ShipCount = new int[10];
 	int playerNum;
+	boolean alive;
 	String playerName;
 	Game game;
 	
@@ -24,6 +25,8 @@ public class Client implements Runnable {
 			e.printStackTrace();
 		}
 		
+		alive = true;
+		
 		for(int i=0; i<ShipCount.length; i++) ShipCount[i] = 0;
 	}
 	
@@ -33,13 +36,14 @@ public class Client implements Runnable {
 			line = in.readLine().trim();
 		} catch(Exception e) {
 			e.printStackTrace();
+			if(game!=null) game.exit();
 			return null;
 		}
 		return line;
 	}
 	
 	public void write(String s) {
-		out.println(s+"\n");
+		out.println(s);
 	}
 	
 	public int y(int j) {
@@ -69,20 +73,37 @@ public class Client implements Runnable {
 			
 			switch(cmd) {
 				case GAMELIST:
-					write(Game.gameList());
+					write(Game.gameList()+";");
 					break;
 				case NEW:
-					write("NEW");
-					if(args.length != 3) write("BAD");
+					if(args.length != 3) write("BAD;");
 					game = new Game(this, args[1], args[2]);
 					break;
 				case JOIN:
-					write("JOIN");
+					if(args.length != 3) write("BAD;");
+					game = Game.getGame(args[1]).addPlayer(this, args[2]);
+					break;
+				case SET:
 					break;
 				case BAD:
-					write("BAD");
+					write("BAD;");
 					break;
 			}
+		}
+	}
+	
+	public void sndMsg(String s) {
+		write("MSG;"+s+";");
+	}
+	
+	public void quit() {
+		write("QUIT;");
+		try {
+			sock.shutdownInput();
+			sock.shutdownOutput();
+			sock.close();
+		} catch(Exception e) {
+			// игнорим
 		}
 	}
 }

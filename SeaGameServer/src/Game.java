@@ -10,7 +10,7 @@ public class Game {
 	static HashMap<Integer, Game> games = new HashMap<Integer, Game>();
 	static int gameCount = 0;
 	
-	Client p1, p2;
+	Client p1=null, p2=null;
 	public String name;
 	State state = State.NEW;
 	int[][] field = new int[15][16];
@@ -32,10 +32,13 @@ public class Game {
 		games.get(gameId).addPlayer(p, pName);
 	}
 	
-	public void addPlayer(Client p, String pName) {
+	public Game addPlayer(Client p, String pName) {
+		if(p2==null) return null; //Player already exists
 		p2 = p;
 		p2.setPlayer(2, pName);
+		p2.sndMsg("Player "+pName+" joined the game.");
 		state = State.CONNECTED;
+		return this;
 	}
 	
 	public void setShip(Client p, int i, int j, int t) {
@@ -65,18 +68,30 @@ public class Game {
 	}
 	
 	public static String gameList() {
-		Set s = games.entrySet();
+		Set<Map.Entry<Integer, Game>> s = games.entrySet();
 		String result = "";
-		Iterator i = s.iterator();
+		Iterator<Map.Entry<Integer, Game>> i = s.iterator();
 		while(i.hasNext()) {
-			Map.Entry t = (Map.Entry)i.next();
+			Map.Entry<Integer, Game>t = i.next();
 			result += t.getKey().toString()+"-"+((Game)t.getValue()).getName()+",";
 		}
 		return result;
 	}
 	
+	public static Game getGame(String gameId) {
+		return games.get(Integer.valueOf(gameId));
+	}
+	
 	public String getName() {
 		return name;
+	}
+	
+	public void exit() {
+		System.out.println("game.exit();");
+		if (p1!=null) p1.quit();
+		if (p2!=null) p2.quit();
+		if(games.containsKey(id))
+			games.remove(id);
 	}
 	
 	private Client opponent(Client p) {
@@ -86,10 +101,4 @@ public class Game {
 	private boolean blockIsPossible(Client p, int i, int j) {
 		return false;
 	}
-	
-	private int blockPower() {
-		// READ THE FINE RULES
-		return 0;
-	}
-	
 }

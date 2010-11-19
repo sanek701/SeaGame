@@ -4,13 +4,14 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Connection implements Runnable {
-	public enum Command {BAD, NEW, JOIN}
+	public enum Command {BAD, NEW, JOIN, MSG, QUIT}
 	
 	Socket sock;
 	BufferedReader in;
 	PrintWriter out;
+	Game game = null;
 	
-	public Connection(String host, String port) {
+	public Connection(String host, String port, Game g) {
 		try {
 			sock = new Socket(host, Integer.valueOf(port));
 			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
@@ -19,6 +20,8 @@ public class Connection implements Runnable {
 			//("Сервер недоступен");
 			e.printStackTrace();
 		}
+		game = g;
+		new Thread(this).start();
 	}
 	
 	public void newGame(String pName, String gName) {
@@ -26,7 +29,7 @@ public class Connection implements Runnable {
 		request(Command.NEW, req);
 	}
 	
-	public void joinGame(int gameId, String pName) {
+	public void joinGame(String gameId, String pName) {
 		
 	}
 	
@@ -48,13 +51,19 @@ public class Connection implements Runnable {
 			}
 			
 			switch(cmd) {
+				case MSG:
+					game.gui.addMsg(args[1]);
+					break;
+				case QUIT:
+					close();
+					break;
 			}
 		}
 	}
 	
 	private String read() {
 		String line = null;
-		try{
+		try {
 			line = in.readLine().trim();
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -85,13 +94,35 @@ public class Connection implements Runnable {
 			outc = new PrintWriter(s.getOutputStream(), true);
 			outc.println("GAMELIST;");
 			games = inc.readLine().split(",");
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 			
-	        String[][] gameList = new String[games.length][2];
-	        for(int i=0; i<games.length; i++)
-	        	gameList[i] = games[i].split("-");
-	        return gameList;
+		String[][] gameList = new String[games.length-1][2];
+		for(int i=0; i<(games.length-1); i++)
+			gameList[i] = games[i].split("-");
+		
+		try {
+			s.shutdownInput();
+			s.shutdownOutput();
+			s.close();
+		} catch(Exception e) {
+			//неважно
+		}
+		
+		return gameList;
+	}
+	
+	public void close() {
+		System.out.println("Connection.close()");
+		try {
+			sock.shutdownInput();
+			sock.shutdownOutput();
+			sock.close();
+		} catch(Exception e) {
+			// ну и фиг
+		}
+		System.out.println("Connection.close() done");
+		//game.over();
 	}
 }

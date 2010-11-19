@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Ship extends JComponent {
+	private static final long serialVersionUID = 1L;
 	static Game game = null;
 	static Image[] lib = null;
 	int x, y, type;

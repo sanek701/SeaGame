@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Gui extends JFrame {
+	private static final long serialVersionUID = 1L;
 	JFrame newGameFrm, selectGameFrm, setHostFrm, errorFrm, createShipFrm=null, deleteShipFrm=null;
 	JLabel errorLbl;
 	JTextArea msgBox;
@@ -42,7 +43,7 @@ public class Gui extends JFrame {
 		setSize(800, 940);
 		mainFrm = this;
 		
-		msgBox = new JTextArea("Сообщение!\n");
+		msgBox = new JTextArea();
 		spane = new JScrollPane(msgBox);
 		spane.setBounds(615, 570, 165, 250);
 			
@@ -74,7 +75,7 @@ public class Gui extends JFrame {
 		
 		i3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				game.exit();	
+				if(game!=null) game.exit();
 			}
 		});
 		
@@ -118,13 +119,13 @@ public class Gui extends JFrame {
 		
 		importImages();
 		mainFrm.add(spane);
-		createField();
+		emptyField();
 		
 		createErrorFrm();
 		setVisible(true);
 	}
 	
-	public void createField() {
+	public void emptyField() {
 		int i, j;
 		for(i=0; i<15; i++) {
 			for(j=0; j<16; j++) {
@@ -166,7 +167,7 @@ public class Gui extends JFrame {
 		createShipFrm.setVisible(true);
 	}
 	
-	public void showDeleteShip(final int x,final int y){
+	public void showDeleteShip(final int x,final int y) {
 		if(deleteShipFrm != null) deleteShipFrm.setVisible(false);
 		deleteShipFrm = new JFrame("Удаление");
 		
@@ -195,12 +196,20 @@ public class Gui extends JFrame {
 		deleteShipFrm.setVisible(true);
 	}
 	
-	public void showError(String s){
+	public void addMsg(String s) {
+		msgBox.append(s+"\n");
+	}
+	
+	public void showError(String s) {
 		errorLbl.setText(s);
 		errorFrm.setVisible(true);
 	}
 	
-	private void createErrorFrm(){
+	public void setGame(Game g) {
+		game = g;
+	}
+	
+	private void createErrorFrm() {
 		errorFrm = new JFrame("Ошибка");
 		errorLbl = new JLabel("Какая-то ошибка");
 		JButton ok= new JButton("Ok");
@@ -229,7 +238,7 @@ public class Gui extends JFrame {
 		Ship.setLib(lib);
 	}
 	
-	private void showCreateGame(){
+	private void showCreateGame() {
 		newGameFrm = new JFrame("Создание Игры");
 		newGameFrm.setSize(400, 300);
 		newGameFrm.setLayout(new FlowLayout());
@@ -243,7 +252,7 @@ public class Gui extends JFrame {
 		ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
 				if(game!=null) game.exit();
-				game = new Game(pName.getText(), gName.getText(), getHost(), getPort(), 0, mainFrm);
+				game = new Game(pName.getText(), gName.getText(), getHost(), getPort(), "", mainFrm);
 				newGameFrm.setVisible(false);
 			}
 		});
@@ -252,29 +261,28 @@ public class Gui extends JFrame {
 		newGameFrm.setVisible(true);
 	}
 	
-	private void showGameList(){
+	private void showGameList() {
 		final String[][] gameList = Connection.getGameList(getHost(), getPort());
 				
 		selectGameFrm = new JFrame("Выбор Игры");
-		selectGameFrm.setSize(400, 25*gameList.length+70);
-		selectGameFrm.setLayout(new FlowLayout());
+		selectGameFrm.setSize(400, 25*gameList.length+90);
 		
-		final JTextField playerNameFld = new JTextField("Игрок", 17);
-		JLabel playerName = new JLabel("Ваше Имя");
+		selectGameFrm.add(new JLabel("Ваше Имя"));
+		final JTextField pName = new JTextField("Игрок", 17);
+		selectGameFrm.getContentPane().add(pName);
+		
 		JRadioButton[] rb = new JRadioButton[gameList.length];
 		final ButtonGroup bg = new ButtonGroup();
 		selectGameFrm.setLayout(new BoxLayout(selectGameFrm.getContentPane(), BoxLayout.Y_AXIS));
 		
-		selectGameFrm.getContentPane().add(playerName);
-		selectGameFrm.getContentPane().add(playerNameFld);
-		
-		for(int i = 0; i < gameList.length; i++ ){
+		for(int i = 0; i < gameList.length; i++) {
 			final int j = i;
 			rb[i]= new JRadioButton(gameList[i][1]+"\n", false);
 			rb[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					selectGameFrm.setVisible(false);
-					game.joinGame(j,playerNameFld.getText());
+					if(game!=null) game.exit();
+					game = new Game(pName.getText(), "", getHost(), getPort(), gameList[j][1], mainFrm);
 				}
 			});
 			bg.add(rb[i]);
@@ -291,10 +299,8 @@ public class Gui extends JFrame {
 			}
 		});
 		
-		
 		selectGameFrm.add(newGame);
 		selectGameFrm.setVisible(true);
-		
 	}
 
 	private void saveChanges(String hostNew, String portNew) {

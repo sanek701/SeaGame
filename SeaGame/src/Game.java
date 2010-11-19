@@ -8,11 +8,11 @@ public class Game {
 	State state;
 	Connection srv = null;
 	
-	public Game(String pName, String gName, String host, String port, int gameId, Gui g) {
+	public Game(String pName, String gName, String host, String port, String gameId, Gui g) {
 		gui = g;
 		Ship.setGame(this);
-		srv = new Connection(host, port);
-		if(gameId==0) {
+		srv = new Connection(host, port, this);
+		if(gameId=="") {
 			srv.newGame(pName, gName);
 			//state = State.NEW;
 			state = State.CREATESHIPS;
@@ -22,9 +22,10 @@ public class Game {
 	}
 	
 	public void exit() {
-	}
-	
-	public void joinGame(int id, String plName){
+		Ship.setGame(null);
+		gui.setGame(null);
+		gui.emptyField();
+		srv.close();
 	}
 	
 	public void createShip(int x, int y, int type) {
