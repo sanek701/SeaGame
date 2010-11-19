@@ -6,6 +6,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 import javax.swing.ButtonGroup;
 import javax.swing.BoxLayout;
 import java.awt.Color;
@@ -19,9 +21,11 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
 
-
 public class Gui extends JFrame {
-	JFrame newGameFrm, selectGameFrm, setHostFrm, createShipFrm=null, deleteShipFrm=null;
+	JFrame newGameFrm, selectGameFrm, setHostFrm, errorFrm, createShipFrm=null, deleteShipFrm=null;
+	JLabel errorLbl;
+	JTextArea msgBox;
+	JScrollPane spane;
 	Gui mainFrm;
 	Game game = null;
 	Ship[][] field = new Ship[15][16];
@@ -37,10 +41,15 @@ public class Gui extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(800, 940);
 		mainFrm = this;
-	
+		
+		msgBox = new JTextArea("Сообщение!\n");
+		spane = new JScrollPane(msgBox);
+		spane.setBounds(615, 570, 165, 250);
+			
 		JMenuBar mbar = new JMenuBar();
 		JMenu m1 = new JMenu("Игра");
 		JMenu m2 = new JMenu("Настройки");
+		
 		JMenuItem i1, i2, i3, i4, i5;
 		m1.add(i1 = new JMenuItem("Новая"));
 		m1.add(i2 = new JMenuItem("Присоединиться"));
@@ -65,7 +74,7 @@ public class Gui extends JFrame {
 		
 		i3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				game.exit();
+				game.exit();	
 			}
 		});
 		
@@ -108,7 +117,10 @@ public class Gui extends JFrame {
 		});
 		
 		importImages();
+		mainFrm.add(spane);
 		createField();
+		
+		createErrorFrm();
 		setVisible(true);
 	}
 	
@@ -181,6 +193,29 @@ public class Gui extends JFrame {
 		deleteShipFrm.add(ok);
 		deleteShipFrm.add(cansel);
 		deleteShipFrm.setVisible(true);
+	}
+	
+	public void showError(String s){
+		errorLbl.setText(s);
+		errorFrm.setVisible(true);
+	}
+	
+	private void createErrorFrm(){
+		errorFrm = new JFrame("Ошибка");
+		errorLbl = new JLabel("Какая-то ошибка");
+		JButton ok= new JButton("Ok");
+		errorFrm.setBounds(400, 400, 240, 100);
+		errorFrm.setLayout(new BoxLayout(errorFrm.getContentPane(), BoxLayout.Y_AXIS));
+		
+		ok.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				errorFrm.setVisible(false);
+			}
+		});
+		ok.setAlignmentX(Component.CENTER_ALIGNMENT);
+		errorLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+		errorFrm.add(errorLbl);
+		errorFrm.add(ok);
 	}
 	
 	private void importImages() {

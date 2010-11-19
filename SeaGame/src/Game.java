@@ -6,11 +6,12 @@ public class Game {
 	int shipSum = 0;
 	Gui gui;
 	State state;
+	Connection srv = null;
 	
 	public Game(String pName, String gName, String host, String port, int gameId, Gui g) {
 		gui = g;
 		Ship.setGame(this);
-		Connection srv = new Connection(host, port);
+		srv = new Connection(host, port);
 		if(gameId==0) {
 			srv.newGame(pName, gName);
 			//state = State.NEW;
