@@ -18,6 +18,7 @@ public class Game {
 			state = State.CREATESHIPS;
 		} else {
 			srv.joinGame(gameId, pName);
+			state = State.CREATESHIPS;
 		}
 	}
 	
@@ -32,6 +33,7 @@ public class Game {
 		shipCnt[type] += 1;
 		shipSum += 1;
 		setShip(x, y, type);
+		srv.createShip(x, y, type);
 	}
 	
 	public void deleteShip(int x, int y, int type) {

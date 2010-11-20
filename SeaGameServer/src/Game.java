@@ -13,7 +13,7 @@ public class Game {
 	Client p1=null, p2=null;
 	public String name;
 	State state = State.NEW;
-	int[][] field = new int[15][16];
+	Ship[][] field = new Ship[15][16];
 	int[][] attackers, defenders;
 	int id;
 	int ready = 0;
@@ -42,7 +42,15 @@ public class Game {
 	}
 	
 	public void setShip(Client p, int i, int j, int t) {
-		
+		if((p.y(i) == i && i>=10 && i<=14) || (p.y(i)!=i && i>=0 && i<=4) ) {
+			 if(t == -1) {
+				 field[i][j] = null;
+			 }else if(field[p.y(i)][j] == null){
+				 field[p.y(i)][j] = new Ship(p, t);
+			 }
+		} else {
+			p.setShip(i,j,-1);
+		}
 	}
 	
 	public void checkShips(Client p) {

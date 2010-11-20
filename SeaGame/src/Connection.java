@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Connection implements Runnable {
-	public enum Command {BAD, NEW, JOIN, MSG, QUIT}
+	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET}
 	
 	Socket sock;
 	BufferedReader in;
@@ -33,6 +33,11 @@ public class Connection implements Runnable {
 		
 	}
 	
+	public void createShip(int x, int y, int t) {
+		String[] req = {Integer.toString(x), Integer.toString(y), Integer.toString(t)};
+		request(Command.SET, req);
+	}
+	
 	public void run() {
 		String str;
 		String[] args;
@@ -56,6 +61,16 @@ public class Connection implements Runnable {
 					break;
 				case QUIT:
 					close();
+					break;
+				case SET:
+					int x = Integer.parseInt(args[1]);
+					int y = Integer.parseInt(args[2]);
+					int t = Integer.parseInt(args[3]);
+					if(Integer.parseInt(args[3]) != -1) {
+						game.createShip(x, y, t);
+					} else {
+						game.deleteShip(x, y, game.gui.field[x][y].type);
+					}
 					break;
 			}
 		}

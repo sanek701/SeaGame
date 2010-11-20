@@ -47,7 +47,7 @@ public class Client implements Runnable {
 	}
 	
 	public int y(int j) {
-		return (playerNum==1) ? (j) : (15-j);
+		return (playerNum == 1) ? (j) : (15-j);
 	}
 	
 	public void setPlayer(int n, String s) {
@@ -84,6 +84,7 @@ public class Client implements Runnable {
 					game = Game.getGame(args[1]).addPlayer(this, args[2]);
 					break;
 				case SET:
+					game.setShip(this, Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]));
 					break;
 				case BAD:
 					write("BAD;");
@@ -94,6 +95,10 @@ public class Client implements Runnable {
 	
 	public void sndMsg(String s) {
 		write("MSG;"+s+";");
+	}
+	
+	public void setShip(int i, int j, int t) {
+		write("SET;"+i+";"+j+";"+t+";");
 	}
 	
 	public void quit() {
