@@ -1,6 +1,6 @@
 
 public class Game {
-	enum State {NEW, CREATESHIPS}
+	enum State {NEW, CREATESHIPS, MOVE}
 	final static int[] normalShipCnt = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
 	int[] shipCnt =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int shipSum = 0;
@@ -29,15 +29,23 @@ public class Game {
 		srv.close();
 	}
 	
+	public void ready(){
+		state = State.Move;
+	}
+	
 	public void createShip(int x, int y, int type) {
-		shipCnt[type] += 1;
-		shipSum += 1;
+		if(type > 0) { 
+			shipCnt[type] += 1;
+			shipSum += 1;
+			if(shipSum == 52) gui.showReadyButton(true);
+		}
 		setShip(x, y, type);
 	}
 	
 	public void deleteShip(int x, int y) {
 		int type = getShip(x, y).type;
 		if(type > 0) { // our ship
+			if(shipSum == 52) gui.showReadyButton(false);
 			shipSum -= 1;
 			shipCnt[type] -= 1;
 		}

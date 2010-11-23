@@ -27,6 +27,7 @@ public class Gui extends JFrame {
 	JLabel errorLbl;
 	JTextArea msgBox;
 	JScrollPane spane;
+	JButton ready;
 	Gui mainFrm;
 	Game game = null;
 	Ship[][] field = new Ship[15][16];
@@ -44,7 +45,8 @@ public class Gui extends JFrame {
 		mainFrm = this;
 		
 		msgBox = new JTextArea();
-		spane = new JScrollPane(msgBox);
+		msgBox.setEditable(false);
+		spane = new JScrollPane(msgBox, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		spane.setBounds(615, 570, 165, 250);
 			
 		JMenuBar mbar = new JMenuBar();
@@ -117,8 +119,20 @@ public class Gui extends JFrame {
 			}
 		});
 		
+		ready = new JButton("Готово");
+		
+		ready.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.ready();
+			}
+		});
+		
+		ready.setBounds(615, 50, 165, 25);
+		ready.setVisible(false);
+		
 		importImages();
 		mainFrm.add(spane);
+		mainFrm.add(ready);
 		emptyField();
 		
 		createErrorFrm();
@@ -207,6 +221,10 @@ public class Gui extends JFrame {
 	
 	public void setGame(Game g) {
 		game = g;
+	}
+	
+	public void showReadyButton(boolean visible){
+		ready.setVisible(visible);
 	}
 	
 	private void createErrorFrm() {

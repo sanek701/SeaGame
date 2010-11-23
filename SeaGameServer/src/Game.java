@@ -3,6 +3,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Map;
 
+
 public class Game {
 	public enum State{NEW, CONNECTED}
 	
@@ -56,9 +57,13 @@ public class Game {
 	
 	public void deleteShip(Client p, int i, int j) {
 		i = p.y(i);
-		field[i][j] = null;
-		p.deleteShip(i, j);
-		opponent(p).deleteShip(i, j);
+		if(field[i][j].owner == p){
+			field[i][j] = null;
+			p.deleteShip(i, j);
+			opponent(p).deleteShip(i, j);
+		}else{
+			p.setShip(i, j, 0);
+		}
 	}
 	
 	public void checkShips(Client p) {
@@ -72,15 +77,39 @@ public class Game {
 	public void moveShip(Client p, int i, int j, int y, int x) {
 		 i = p.y(i); y = p.y(y);
 		 int type = field[i][j].type;
+		 double dist = distance(i,j,y,x);
 		 
-		 p.setShip(y, x, type);
-		 opponent(p).setShip(y, x, 0);
+		 if (field[i][j]!=null) {
+			 cancelMove(p, i, j, y, x, type);
+			 return;
+		 }
 		 
-		 p.setShip(i, j, -1);
-		 opponent(p).setShip(i, j, -1);
-		 
-		 field[y][x] = field[i][j];
-		 field[i][j] = null;
+		 if(dist == 1) {
+		     if(type == 8) {
+				cancelMove(p, i, j, y, x, type);
+			 }else if (type == 11 && (!checkTral(i,j) || !checkTral(y,x))) {
+				cancelMove(p, i, j, y, x, type);
+			 }else{
+				acceptMove(p, i, j, y, x, type);
+			 }
+		 }else if(dist > 1 && dist < 2) {
+			// Провераем если катер пошел через клетку прямо
+			 if( abs(i-y)==2 || abs(j-x)==2 ) {
+				 //если занята ячейка через которую от "прыгает"
+				 if (field[i+signum(y-i)][j+signum(x-i)]!=null){
+					cancelMove(p, i, j, y, x, type);
+				 }else{
+					acceptMove(p, i, j, y, x, type);
+				 }
+				 //Если прыгаем в угловую проверяем есть хоть одна своюодная клетка
+			 }else if(field[i+signum(y-i)][j]!=null && field[i][j+signum(x-j)]!=null){
+				 cancelMove(p, i, j, y, x, type);
+			 }else{
+				 acceptMove(p, i, j, y, x, type);
+			 }
+		 }else{
+			 cancelMove(p, i, j, y, x, type);
+		 }
 	}
 	
 	public void ask(Client p, int[][] attackers, int i, int j) {
@@ -118,6 +147,41 @@ public class Game {
 		if (p2!=null) p2.quit();
 		if(games.containsKey(id))
 			games.remove(id);
+	}
+	
+	private double distance(int x1, int y1, int x2, int y2) {
+		return 0.0;
+	}
+	
+	private boolean checkTral(int i,int j){
+		return true;
+	}
+	
+	private void cancelMove(Client p, int i, int j, int y, int x, int type){
+		 p.setShip(i, j, type); 
+		 p.setShip(y, x, -1);
+	}
+	
+	private void acceptMove(Client p, int i, int j, int y, int x, int type){	
+		p.setShip(y, x, type);
+		opponent(p).setShip(y, x, 0);
+		 
+		p.setShip(i, j, -1);
+		opponent(p).setShip(i, j, -1);
+		 
+		field[y][x] = field[i][j];
+		field[i][j] = null;
+	}
+	
+	private int signum(int i){
+		if(i > 0) return 1;
+		if(i < 0) return -1;
+		return 0;
+	}
+	
+	private int abs(int i){
+		if(i<0) i*=-1;
+		return i;
 	}
 	
 	private Client opponent(Client p) {
