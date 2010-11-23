@@ -69,8 +69,18 @@ public class Game {
 		
 	}
 	
-	public void moveShip(Client p, int i, int j, int x, int y) {
-		// y = p.y(y);
+	public void moveShip(Client p, int i, int j, int y, int x) {
+		 i = p.y(i); y = p.y(y);
+		 int type = field[i][j].type;
+		 
+		 p.setShip(y, x, type);
+		 opponent(p).setShip(y, x, 0);
+		 
+		 p.setShip(i, j, -1);
+		 opponent(p).setShip(i, j, -1);
+		 
+		 field[y][x] = field[i][j];
+		 field[i][j] = null;
 	}
 	
 	public void ask(Client p, int[][] attackers, int i, int j) {
