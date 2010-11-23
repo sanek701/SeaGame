@@ -33,24 +33,32 @@ public class Game {
 	}
 	
 	public Game addPlayer(Client p, String pName) {
-		if(p2==null) return null; //Player already exists
+		if(p2!=null) return null; //Player already exists
 		p2 = p;
 		p2.setPlayer(2, pName);
-		p2.sndMsg("Player "+pName+" joined the game.");
+		p1.sndMsg("Player "+pName+" joined the game.");
+		p2.sndMsg("Welcome to "+name+"("+p1.playerName+").");
 		state = State.CONNECTED;
 		return this;
 	}
 	
 	public void setShip(Client p, int i, int j, int t) {
-		if((p.y(i) == i && i>=10 && i<=14) || (p.y(i)!=i && i>=0 && i<=4) ) {
-			 if(t == -1) {
-				 field[i][j] = null;
-			 }else if(field[p.y(i)][j] == null){
-				 field[p.y(i)][j] = new Ship(p, t);
+		i = p.y(i);
+		if( (p.playerNum==1 && i>=0 && i<=4) || (p.playerNum==2 && i>=10 && i<=14) ) {
+			 if(field[i][j] == null) {
+				 field[i][j] = new Ship(p, t);
+				 p.setShip(i, j, t);
+				 opponent(p).setShip(i, j, 0);
+				 return;
 			 }
-		} else {
-			p.setShip(i,j,-1);
 		}
+	}
+	
+	public void deleteShip(Client p, int i, int j) {
+		i = p.y(i);
+		field[i][j] = null;
+		p.deleteShip(i, j);
+		opponent(p).deleteShip(i, j);
 	}
 	
 	public void checkShips(Client p) {

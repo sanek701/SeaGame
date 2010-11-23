@@ -8,7 +8,7 @@ public class Client implements Runnable {
 	BufferedReader in;
 	PrintWriter out;
 	
-	public enum Command {BAD, NEW, JOIN, GAMELIST, SET}
+	public enum Command {BAD, NEW, JOIN, GAMELIST, SET, DEL}
 	
 	public int[] ShipCount = new int[10];
 	int playerNum;
@@ -47,7 +47,7 @@ public class Client implements Runnable {
 	}
 	
 	public int y(int j) {
-		return (playerNum == 1) ? (j) : (15-j);
+		return (playerNum == 2) ? (j) : (14-j);
 	}
 	
 	public void setPlayer(int n, String s) {
@@ -84,8 +84,10 @@ public class Client implements Runnable {
 					game = Game.getGame(args[1]).addPlayer(this, args[2]);
 					break;
 				case SET:
-					game.setShip(this, Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+					game.setShip(this, Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
 					break;
+				case DEL:
+					game.deleteShip(this, Integer.parseInt(args[1]),Integer.parseInt(args[2]));
 				case BAD:
 					write("BAD;");
 					break;
@@ -98,7 +100,11 @@ public class Client implements Runnable {
 	}
 	
 	public void setShip(int i, int j, int t) {
-		write("SET;"+i+";"+j+";"+t+";");
+		write("SET;"+y(i)+";"+j+";"+t+";");
+	}
+	
+	public void deleteShip(int i, int j) {
+		write("DEL;"+y(i)+";"+j+";");
 	}
 	
 	public void quit() {

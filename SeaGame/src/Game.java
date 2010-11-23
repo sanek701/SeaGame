@@ -33,13 +33,20 @@ public class Game {
 		shipCnt[type] += 1;
 		shipSum += 1;
 		setShip(x, y, type);
-		srv.createShip(x, y, type);
 	}
 	
-	public void deleteShip(int x, int y, int type) {
-		shipCnt[type] -= 1;
-		shipSum -= 1;
+	public void deleteShip(int x, int y) {
+		int type = getShip(x, y).type;
+		if(type > 0) { // our ship
+			shipSum -= 1;
+			shipCnt[type] -= 1;
+		}
+		
 		setShip(x, y, -1);
+	}
+	
+	private Ship getShip(int x, int y) {
+		return gui.field[x][y];
 	}
 	
 	private void setShip(int x, int y, int t) {

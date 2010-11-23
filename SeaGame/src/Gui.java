@@ -157,7 +157,7 @@ public class Gui extends JFrame {
 			type[i-1].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					createShipFrm.setVisible(false);
-					game.createShip(p, q, k);
+					game.srv.createShip(p, q, k);
 				}
 			});
 			bg.add(type[i-1]);
@@ -179,7 +179,7 @@ public class Gui extends JFrame {
 		
 		ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				game.deleteShip(x, y, field[x][y].type);
+				game.srv.deleteShip(x, y);
 				deleteShipFrm.setVisible(false);
 			}
 		});
@@ -282,7 +282,7 @@ public class Gui extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					selectGameFrm.setVisible(false);
 					if(game!=null) game.exit();
-					game = new Game(pName.getText(), "", getHost(), getPort(), gameList[j][1], mainFrm);
+					game = new Game(pName.getText(), "", getHost(), getPort(), gameList[j][0], mainFrm);
 				}
 			});
 			bg.add(rb[i]);

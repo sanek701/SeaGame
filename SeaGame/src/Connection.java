@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Connection implements Runnable {
-	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET}
+	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL}
 	
 	Socket sock;
 	BufferedReader in;
@@ -30,7 +30,8 @@ public class Connection implements Runnable {
 	}
 	
 	public void joinGame(String gameId, String pName) {
-		
+		String[] req = {gameId, pName};
+		request(Command.JOIN, req);
 	}
 	
 	public void createShip(int x, int y, int t) {
@@ -38,10 +39,16 @@ public class Connection implements Runnable {
 		request(Command.SET, req);
 	}
 	
+	public void deleteShip(int x, int y) {
+		String[] req = {Integer.toString(x), Integer.toString(y)};
+		request(Command.DEL, req);
+	}
+	
 	public void run() {
 		String str;
 		String[] args;
 		Command cmd;
+		int x, y, t;
 
 		while(true) {
 			str = read();
@@ -63,14 +70,15 @@ public class Connection implements Runnable {
 					close();
 					break;
 				case SET:
-					int x = Integer.parseInt(args[1]);
-					int y = Integer.parseInt(args[2]);
-					int t = Integer.parseInt(args[3]);
-					if(Integer.parseInt(args[3]) != -1) {
-						game.createShip(x, y, t);
-					} else {
-						game.deleteShip(x, y, game.gui.field[x][y].type);
-					}
+					x = Integer.parseInt(args[1]);
+					y = Integer.parseInt(args[2]);
+					t = Integer.parseInt(args[3]);
+					game.createShip(x, y, t);
+					break;
+				case DEL:
+					x = Integer.parseInt(args[1]);
+					y = Integer.parseInt(args[2]);
+					game.deleteShip(x, y);
 					break;
 			}
 		}
