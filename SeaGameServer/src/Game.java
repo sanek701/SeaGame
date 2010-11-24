@@ -67,6 +67,7 @@ public class Game {
 	}
 	
 	public void checkShips(Client p) {
+		boolean tmp = true;
 		int[] normalShipCnt = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
 		int[] shipCnt =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		for(int i=0; i<15; i++) {
@@ -76,7 +77,13 @@ public class Game {
 				}
 			}
 		}
-		if(normalShipCnt!=shipCnt) {			
+		for(int i=1; i<12; i++) {
+			if(normalShipCnt[i] != shipCnt[i]) {
+					tmp=false;
+				}
+			}
+		}
+		if(tmp == false) {			
 			String text = "Bad boy";
 			p.sndMsg(text);
 		}
