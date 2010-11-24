@@ -67,7 +67,19 @@ public class Game {
 	}
 	
 	public void checkShips(Client p) {
-		
+		int[] normalShipCnt = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
+		int[] shipCnt =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		for(int i=0; i<15; i++) {
+			for(int j=0; j<16; j++) {
+				if(field[i][j]!=null && field[i][j].owner==p) {
+					shipCnt[field[i][j].type] = shipCnt[field[i][j].type] + 1;
+				}
+			}
+		}
+		if(normalShipCnt!=shipCnt) {			
+			String text = "Bad boy";
+			p.sndMsg(text);
+		}
 	}
 	
 	public void begin() {
