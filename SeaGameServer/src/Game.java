@@ -17,8 +17,8 @@ public class Game {
 	Ship[][] field = new Ship[15][16];
 	int[][] attackers, defenders;
 	int id;
-	int ready = 0;
-	int order = 1;
+	int playersReady = 0;
+	int order = 0;
 	
 	public Game(Client p, String pName, String gName) {
 		name = gName;
@@ -40,6 +40,8 @@ public class Game {
 		p1.sndMsg("Player "+pName+" joined the game.");
 		p2.sndMsg("Welcome to "+name+"("+p1.playerName+").");
 		state = State.CONNECTED;
+		p1.setState("CREATESHIPS");
+		p2.setState("CREATESHIPS");
 		return this;
 	}
 	
@@ -57,17 +59,17 @@ public class Game {
 	
 	public void deleteShip(Client p, int i, int j) {
 		i = p.y(i);
-		if(field[i][j].owner == p){
+		if(field[i][j].owner == p) {
 			field[i][j] = null;
 			p.deleteShip(i, j);
 			opponent(p).deleteShip(i, j);
-		}else{
+		} else {
 			p.setShip(i, j, 0);
 		}
 	}
 	
 	public void checkShips(Client p) {
-		boolean tmp = true;
+		boolean result = true;
 		int[] normalShipCnt = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
 		int[] shipCnt =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		for(int i=0; i<15; i++) {
@@ -79,18 +81,21 @@ public class Game {
 		}
 		for(int i=1; i<12; i++) {
 			if(normalShipCnt[i] != shipCnt[i]) {
-					tmp=false;
-				}
+					result = false;
 			}
 		}
-		if(tmp == false) {			
-			String text = "Bad boy";
+		if(result && !p.ready) {
+			p.setState("WAITING");
+			p.ready = true;
+			playersReady += 1;
+			if(playersReady==2) { // Starts the game
+				order = 1;
+				p1.setState("MOVE");
+			}
+		} else {
+			String text = "Wrong amount of ships.";
 			p.sndMsg(text);
 		}
-	}
-	
-	public void begin() {
-		
 	}
 	
 	public void moveShip(Client p, int i, int j, int y, int x) {
@@ -106,27 +111,27 @@ public class Game {
 		 if(dist == 1) {
 		     if(type == 8) {
 				cancelMove(p, i, j, y, x, type);
-			 }else if (type == 11 && (!checkTral(i,j) || !checkTral(y,x))) {
+			 } else if (type == 11 && (!checkTral(i,j) || !checkTral(y,x))) {
 				cancelMove(p, i, j, y, x, type);
-			 }else{
+			 } else {
 				acceptMove(p, i, j, y, x, type);
 			 }
-		 }else if(dist > 1 && dist < 2) {
+		 } else if(dist > 1 && dist < 2) {
 			// Провераем если катер пошел через клетку прямо
 			 if( abs(i-y)==2 || abs(j-x)==2 ) {
 				 //если занята ячейка через которую от "прыгает"
-				 if (field[i+signum(y-i)][j+signum(x-i)]!=null){
+				 if(field[i+signum(y-i)][j+signum(x-i)]!=null) {
 					cancelMove(p, i, j, y, x, type);
-				 }else{
+				 } else {
 					acceptMove(p, i, j, y, x, type);
 				 }
 				 //Если прыгаем в угловую проверяем есть хоть одна своюодная клетка
-			 }else if(field[i+signum(y-i)][j]!=null && field[i][j+signum(x-j)]!=null){
+			 } else if(field[i+signum(y-i)][j]!=null && field[i][j+signum(x-j)]!=null) {
 				 cancelMove(p, i, j, y, x, type);
-			 }else{
+			 } else {
 				 acceptMove(p, i, j, y, x, type);
 			 }
-		 }else{
+		 } else {
 			 cancelMove(p, i, j, y, x, type);
 		 }
 	}

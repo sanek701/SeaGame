@@ -1,6 +1,6 @@
 
 public class Game {
-	enum State {NEW, CREATESHIPS, MOVE}
+	enum State {WAITING, CREATESHIPS, MOVE}
 	final static int[] normalShipCnt = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
 	int[] shipCnt =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int shipSum = 0;
@@ -14,11 +14,10 @@ public class Game {
 		srv = new Connection(host, port, this);
 		if(gameId=="") {
 			srv.newGame(pName, gName);
-			//state = State.NEW;
-			state = State.CREATESHIPS;
+			state = State.WAITING;
 		} else {
 			srv.joinGame(gameId, pName);
-			state = State.CREATESHIPS;
+			state = State.WAITING;
 		}
 	}
 	
@@ -29,8 +28,9 @@ public class Game {
 		srv.close();
 	}
 	
-	public void ready(){
-		state = State.Move;
+	public void ready() {
+		srv.plReady();
+		gui.showReadyButton(false);
 	}
 	
 	public void createShip(int x, int y, int type) {
@@ -51,6 +51,15 @@ public class Game {
 		}
 		
 		setShip(x, y, -1);
+	}
+	
+	public void moveShip() {
+		
+	}
+	
+	public void setState(String str) {
+		State st = Enum.valueOf(State.class, str);
+		state = st;
 	}
 	
 	private Ship getShip(int x, int y) {

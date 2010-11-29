@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Connection implements Runnable {
-	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL}
+	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL, STATE, READY, MOVE}
 	
 	Socket sock;
 	BufferedReader in;
@@ -44,6 +44,16 @@ public class Connection implements Runnable {
 		request(Command.DEL, req);
 	}
 	
+	public void plReady() {
+		request(Command.READY, null);
+	}
+	
+	public void moveShip(int i, int j, int x, int y) {
+		String[] req = {Integer.toString(i), Integer.toString(j),
+						Integer.toString(x), Integer.toString(y)};
+		request(Command.MOVE, req);
+	}
+	
 	public void run() {
 		String str;
 		String[] args;
@@ -80,6 +90,9 @@ public class Connection implements Runnable {
 					y = Integer.parseInt(args[2]);
 					game.deleteShip(x, y);
 					break;
+				case STATE:
+					game.setState(args[1]);
+					break;
 			}
 		}
 	}
@@ -98,8 +111,9 @@ public class Connection implements Runnable {
 	
 	private void request(Command cmd, String[] args) {
 		String s = cmd.toString()+";";
-		for(int i=0; i<args.length; i++)	// join args with ';'
-			s += args[i]+";";
+		if(args!=null)
+			for(int i=0; i<args.length; i++)	// join args with ';'
+				s += args[i]+";";
 
 		System.out.println("-> "+s); //debug
 		out.println(s);

@@ -9,14 +9,16 @@ public class Ship extends JComponent {
 	private static final long serialVersionUID = 1L;
 	static Game game = null;
 	static Image[] lib = null;
+	static Ship oldPosition = null;
 	int x, y, type;
 	boolean selected, enemy;
 	enum Type {L, K, E, S, TK, TR, PL, F, A, T, M}
 	
 	public Ship(int t, int i, int j) {
-		x = i;
-		y = j;
+		x = j;
+		y = i;
 		type = t;
+		final Ship thisShip = this;
 		
 		addMouseListener(new MouseAdapter( ) {
 			public void mousePressed(MouseEvent me) {
@@ -24,10 +26,28 @@ public class Ship extends JComponent {
 				switch(game.state) {
 					case CREATESHIPS:
 						if(type==-1 && game.shipSum < 52) {
-							game.gui.showCreateShip(x, y);
+							game.gui.showCreateShip(y, x);
 						} else if(type>0) { 
-							game.gui.showDeleteShip(x, y);
+							game.gui.showDeleteShip(y, x);
 						}
+						break;
+					case MOVE:
+						if(oldPosition==null) {
+							if(type<=0)break; // Enemy or an empty field
+							oldPosition = thisShip;
+							selected = true;
+							repaint();
+						} else {
+							if(oldPosition != thisShip) {
+								if(type!=0) break; //Not an empty field
+								game.srv.moveShip(oldPosition.y, oldPosition.x, y, x);
+							}
+							
+							oldPosition = null;
+							selected = false;
+							repaint();
+						}
+						break;
 				}
 			}
 		});
@@ -35,9 +55,9 @@ public class Ship extends JComponent {
 	
 	public void paint(Graphics g) {
 		Color c=g.getColor();
-		if(x>=0) g.setColor(Color.blue);
-		if(x>=5) g.setColor(Color.black);
-		if(x>=10) g.setColor(Color.blue);
+		if(y>=0) g.setColor(Color.blue);
+		if(y>=5) g.setColor(Color.black);
+		if(y>=10) g.setColor(Color.blue);
 		if(type!=-1) {
 			g.drawImage(lib[type], 1, 1, 34, 52, this);
 		}

@@ -48,6 +48,7 @@ public class Gui extends JFrame {
 		msgBox.setEditable(false);
 		spane = new JScrollPane(msgBox, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		spane.setBounds(615, 570, 165, 250);
+		
 			
 		JMenuBar mbar = new JMenuBar();
 		JMenu m1 = new JMenu("Игра");
@@ -119,16 +120,16 @@ public class Gui extends JFrame {
 			}
 		});
 		
-		ready = new JButton("Готово");
 		
+		ready = new JButton("Готово");
 		ready.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.ready();
 			}
 		});
-		
 		ready.setBounds(615, 50, 165, 25);
 		ready.setVisible(false);
+		
 		
 		importImages();
 		mainFrm.add(spane);

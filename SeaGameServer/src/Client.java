@@ -8,11 +8,11 @@ public class Client implements Runnable {
 	BufferedReader in;
 	PrintWriter out;
 	
-	public enum Command {BAD, NEW, JOIN, GAMELIST, SET, DEL}
+	public enum Command {BAD, NEW, JOIN, GAMELIST, SET, DEL, READY, MOVE}
 	
 	public int[] ShipCount = new int[10];
+	public boolean ready;
 	int playerNum;
-	boolean alive;
 	String playerName;
 	Game game;
 	
@@ -24,8 +24,6 @@ public class Client implements Runnable {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		
-		alive = true;
 		
 		for(int i=0; i<ShipCount.length; i++) ShipCount[i] = 0;
 	}
@@ -88,10 +86,22 @@ public class Client implements Runnable {
 					break;
 				case DEL:
 					game.deleteShip(this, Integer.parseInt(args[1]),Integer.parseInt(args[2]));
-				case BAD:
-					write("BAD;");
+					break;
+				case READY:
+					proceedReady();
+					break;
+				case MOVE:
+					write("MSG;MOVED;");
 					break;
 			}
+		}
+	}
+	
+	private void proceedReady() {
+		switch(game.state) {
+			case CONNECTED:
+				game.checkShips(this);
+				break;
 		}
 	}
 	
@@ -105,6 +115,10 @@ public class Client implements Runnable {
 	
 	public void deleteShip(int i, int j) {
 		write("DEL;"+y(i)+";"+j+";");
+	}
+	
+	public void setState(String st) {
+		write("STATE;"+st+";");
 	}
 	
 	public void quit() {
