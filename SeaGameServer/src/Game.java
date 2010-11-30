@@ -98,41 +98,34 @@ public class Game {
 		}
 	}
 	
-	public void moveShip(Client p, int i, int j, int y, int x) {
+	public void moveShip(Client p, int i, int j, int x, int y) {
 		 i = p.y(i); y = p.y(y);
 		 int type = field[i][j].type;
 		 double dist = distance(i,j,y,x);
 		 
-		 if (field[i][j]!=null) {
-			 cancelMove(p, i, j, y, x, type);
+		 if (field[y][x]!=null) {
 			 return;
 		 }
-		 
-		 if(dist == 1) {
-		     if(type == 8) {
-				cancelMove(p, i, j, y, x, type);
-			 } else if (type == 11 && (!checkTral(i,j) || !checkTral(y,x))) {
-				cancelMove(p, i, j, y, x, type);
-			 } else {
-				acceptMove(p, i, j, y, x, type);
+
+		 if(dist == 1.0) {
+		     if(type == 11 && checkTral(i,j) && checkTral(y,x)) {
+		    	 acceptMove(p, i, j, y, x, type);
+			 }else if (type != 8 && type != 11) {
+				 acceptMove(p, i, j, y, x, type);
 			 }
-		 } else if(dist > 1 && dist < 2) {
+		 } else if(dist > 1.0 && dist <= 2.0 && type == 5) {
 			// Провераем если катер пошел через клетку прямо
-			 if( abs(i-y)==2 || abs(j-x)==2 ) {
+			 if( abs(i-y)==2 || abs(j-x)==2) {
 				 //если занята ячейка через которую от "прыгает"
-				 if(field[i+signum(y-i)][j+signum(x-i)]!=null) {
-					cancelMove(p, i, j, y, x, type);
-				 } else {
+				 if(field[i+signum(y-i)][j+signum(x-j)] == null) {
 					acceptMove(p, i, j, y, x, type);
 				 }
 				 //Если прыгаем в угловую проверяем есть хоть одна своюодная клетка
-			 } else if(field[i+signum(y-i)][j]!=null && field[i][j+signum(x-j)]!=null) {
-				 cancelMove(p, i, j, y, x, type);
-			 } else {
+			 } else if(field[i+signum(y-i)][j] == null || field[i][j+signum(x-j)] == null ) {
 				 acceptMove(p, i, j, y, x, type);
 			 }
 		 } else {
-			 cancelMove(p, i, j, y, x, type);
+				 p.sndMsg("dist wrong");
 		 }
 	}
 	
@@ -174,11 +167,29 @@ public class Game {
 	}
 	
 	private double distance(int x1, int y1, int x2, int y2) {
-		return 0.0;
+		return Math.sqrt( (double)(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)); 
 	}
 	
-	private boolean checkTral(int i,int j){
-		return true;
+	private boolean checkTral(int i,int j) {
+		int k, t;
+		int top = i-1;
+		int bottom = i+1;
+		int right = j+1;
+		int left = j-1;
+		
+		if ((i-1) < 0) top = 0;
+		if ((i+1) > 14) bottom = 14;
+		if ((j-1) < 0) left = 0;
+		if ((j+1) > 15)right = 15;
+		System.out.println(top+" "+bottom+" "+left+" "+right);
+		for(k = top; k <= bottom; k++) {
+			for(t = left; t <= right; t++) {
+				System.out.println(k+" "+t);
+				if (field[k][t]!= null && field[k][t].type == 5) return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	private void cancelMove(Client p, int i, int j, int y, int x, int type){

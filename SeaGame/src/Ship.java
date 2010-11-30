@@ -33,14 +33,14 @@ public class Ship extends JComponent {
 						break;
 					case MOVE:
 						if(oldPosition==null) {
-							if(type<=0)break; // Enemy or an empty field
+							if(type<=0) break; // Enemy or an empty field
 							oldPosition = thisShip;
 							selected = true;
 							repaint();
 						} else {
 							if(oldPosition != thisShip) {
-								if(type!=0) break; //Not an empty field
-								game.srv.moveShip(oldPosition.y, oldPosition.x, y, x);
+								if(type!=-1) break; //Not an empty field
+								game.srv.moveShip(oldPosition.y, oldPosition.x, x, y);
 							}
 							
 							oldPosition = null;

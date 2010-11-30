@@ -91,6 +91,7 @@ public class Client implements Runnable {
 					proceedReady();
 					break;
 				case MOVE:
+					game.moveShip(this, Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]));
 					write("MSG;MOVED;");
 					break;
 			}

@@ -27,7 +27,7 @@ public class Gui extends JFrame {
 	JLabel errorLbl;
 	JTextArea msgBox;
 	JScrollPane spane;
-	JButton ready;
+	JButton ready, test, test1;
 	Gui mainFrm;
 	Game game = null;
 	Ship[][] field = new Ship[15][16];
@@ -119,7 +119,16 @@ public class Gui extends JFrame {
 				setHostFrm.setVisible(true);
 			}
 		});
-		
+		//---------------------TEMP---------------------
+		test = new JButton("Player1");
+		test.setBounds(660, 300, 100, 26);
+		test.setVisible(true);
+		test.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.test(1);
+			}
+		});
+		mainFrm.add(test);
 		
 		ready = new JButton("Готово");
 		ready.addActionListener(new ActionListener() {

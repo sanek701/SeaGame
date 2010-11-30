@@ -62,6 +62,61 @@ public class Game {
 		state = st;
 	}
 	
+	public void test(int p) {
+		srv.createShip(14,0,1);
+		srv.createShip(14,1,1);
+		srv.createShip(14,2,2);
+		srv.createShip(14,3,2);
+		srv.createShip(14,4,2);
+		srv.createShip(14,5,2);
+		srv.createShip(14,6,2);
+		srv.createShip(14,7,3);
+		srv.createShip(14,8,3);
+		srv.createShip(14,9,3);
+		srv.createShip(14,10,3);
+		srv.createShip(14,11,3);
+		srv.createShip(14,12,3);
+		srv.createShip(14,13,4);
+		srv.createShip(14,14,4);
+		srv.createShip(14,15,4);
+		srv.createShip(13,13,4);
+		srv.createShip(13,14,4);
+		srv.createShip(13,15,4);
+		srv.createShip(13,12,5);
+		srv.createShip(13,11,5);
+		srv.createShip(13,10,5);
+		srv.createShip(13,9,5);
+		srv.createShip(13,8,5);
+		srv.createShip(13,7,5);
+		srv.createShip(13,6,6);
+		srv.createShip(13,5,6);
+		srv.createShip(13,4,6);
+		srv.createShip(13,3,6);
+		srv.createShip(13,2,6);
+		srv.createShip(13,1,6);
+		srv.createShip(13,0,9);
+		srv.createShip(12,0,7);
+		srv.createShip(12,1,7);
+		srv.createShip(12,2,7);
+		srv.createShip(12,3,7);
+		srv.createShip(12,4,7);
+		srv.createShip(12,5,7);
+		srv.createShip(12,6,8);
+		srv.createShip(12,7,8);
+		srv.createShip(12,8,10);
+		srv.createShip(12,9,10);
+		srv.createShip(12,10,10);
+		srv.createShip(12,11,10);
+		srv.createShip(12,12,10);
+		srv.createShip(12,13,10);
+		srv.createShip(11,0,11);
+		srv.createShip(11,1,11);
+		srv.createShip(11,2,11);
+		srv.createShip(11,3,11);
+		srv.createShip(11,4,11);
+		srv.createShip(11,5,11);
+	}
+	
 	private Ship getShip(int x, int y) {
 		return gui.field[x][y];
 	}
