@@ -5,7 +5,7 @@ import java.util.Map;
 
 
 public class Game {
-	public enum State{NEW, CONNECTED}
+	public enum State{NEW, CONNECTED, MOVE, ASK}
 	
 	static int[] shipPower = {0, 0};
 	static HashMap<Integer, Game> games = new HashMap<Integer, Game>();
@@ -46,6 +46,8 @@ public class Game {
 	}
 	
 	public void setShip(Client p, int i, int j, int t) {
+		if(state!=State.CONNECTED) return;
+		
 		i = p.y(i);
 		if( (p.playerNum==1 && i>=0 && i<=4) || (p.playerNum==2 && i>=10 && i<=14) ) {
 			 if(field[i][j] == null) {
@@ -58,6 +60,8 @@ public class Game {
 	}
 	
 	public void deleteShip(Client p, int i, int j) {
+		if(state!=State.CONNECTED) return;
+		
 		i = p.y(i);
 		if(field[i][j].owner == p) {
 			field[i][j] = null;
@@ -68,7 +72,28 @@ public class Game {
 		}
 	}
 	
+	public void proceedReady(Client p) {
+		switch(state) {
+			case CONNECTED:
+				checkShips(p);
+				break;
+			case ASK:
+				if(order==1) {
+					order = 2;
+					p2.setState("MOVE");
+					p1.setState("WAITING");
+				} else {
+					order = 1;
+					p1.setState("MOVE");
+					p2.setState("WAITING");
+				}
+				break;
+		}
+	}
+	
 	public void checkShips(Client p) {
+		if(state!=State.CONNECTED) return;
+		
 		boolean result = true;
 		int[] normalShipCnt = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
 		int[] shipCnt =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -89,21 +114,25 @@ public class Game {
 			p.ready = true;
 			playersReady += 1;
 			if(playersReady==2) { // Starts the game
+				state = State.MOVE;
 				order = 1;
 				p1.setState("MOVE");
 			}
 		} else {
-			String text = "Wrong amount of ships.";
+			String text = "Неверное количество кораблей";
 			p.sndMsg(text);
 		}
 	}
 	
 	public void moveShip(Client p, int i, int j, int x, int y) {
+		if(state!=State.MOVE) return;
+		
 		 i = p.y(i); y = p.y(y);
 		 int type = field[i][j].type;
 		 double dist = distance(i,j,y,x);
 		 
 		 if (field[y][x]!=null) {
+			 p.sndMsg("Неверный ход");
 			 return;
 		 }
 
@@ -125,11 +154,27 @@ public class Game {
 				 acceptMove(p, i, j, y, x, type);
 			 }
 		 } else {
-				 p.sndMsg("dist wrong");
+				 p.sndMsg("Неверный ход");
 		 }
 	}
 	
+	private void acceptMove(Client p, int i, int j, int y, int x, int type) {	
+		p.setShip(y, x, type);
+		opponent(p).setShip(y, x, 0);
+		 
+		p.setShip(i, j, -1);
+		opponent(p).setShip(i, j, -1);
+		 
+		field[y][x] = field[i][j];
+		field[i][j] = null;
+		
+		state = State.ASK;
+		p.setState("ASK");
+	}
+	
 	public void ask(Client p, int[][] attackers, int i, int j) {
+		if(state!=State.ASK) return;
+		
 		if(blockIsPossible(opponent(p), i, j)) {
 			
 		}
@@ -181,31 +226,15 @@ public class Game {
 		if ((i+1) > 14) bottom = 14;
 		if ((j-1) < 0) left = 0;
 		if ((j+1) > 15)right = 15;
-		System.out.println(top+" "+bottom+" "+left+" "+right);
+		//System.out.println(top+" "+bottom+" "+left+" "+right);
 		for(k = top; k <= bottom; k++) {
 			for(t = left; t <= right; t++) {
-				System.out.println(k+" "+t);
+				//System.out.println(k+" "+t);
 				if (field[k][t]!= null && field[k][t].type == 5) return true;
 			}
 		}
 		
 		return false;
-	}
-	
-	private void cancelMove(Client p, int i, int j, int y, int x, int type){
-		 p.setShip(i, j, type); 
-		 p.setShip(y, x, -1);
-	}
-	
-	private void acceptMove(Client p, int i, int j, int y, int x, int type){	
-		p.setShip(y, x, type);
-		opponent(p).setShip(y, x, 0);
-		 
-		p.setShip(i, j, -1);
-		opponent(p).setShip(i, j, -1);
-		 
-		field[y][x] = field[i][j];
-		field[i][j] = null;
 	}
 	
 	private int signum(int i){

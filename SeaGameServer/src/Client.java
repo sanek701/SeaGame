@@ -8,7 +8,7 @@ public class Client implements Runnable {
 	BufferedReader in;
 	PrintWriter out;
 	
-	public enum Command {BAD, NEW, JOIN, GAMELIST, SET, DEL, READY, MOVE}
+	public enum Command {BAD, NEW, JOIN, GAMELIST, SET, DEL, READY, MOVE, ASK}
 	
 	public int[] ShipCount = new int[10];
 	public boolean ready;
@@ -82,27 +82,23 @@ public class Client implements Runnable {
 					game = Game.getGame(args[1]).addPlayer(this, args[2]);
 					break;
 				case SET:
-					game.setShip(this, Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+					game.setShip(this, Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+							Integer.parseInt(args[3]));
 					break;
 				case DEL:
-					game.deleteShip(this, Integer.parseInt(args[1]),Integer.parseInt(args[2]));
+					game.deleteShip(this, Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 					break;
 				case READY:
-					proceedReady();
+					game.proceedReady(this);
 					break;
 				case MOVE:
-					game.moveShip(this, Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]));
-					write("MSG;MOVED;");
+					game.moveShip(this, Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+							Integer.parseInt(args[3]),Integer.parseInt(args[4]));
+					break;
+				case ASK:
+					write("MSG;ASK;");
 					break;
 			}
-		}
-	}
-	
-	private void proceedReady() {
-		switch(game.state) {
-			case CONNECTED:
-				game.checkShips(this);
-				break;
 		}
 	}
 	

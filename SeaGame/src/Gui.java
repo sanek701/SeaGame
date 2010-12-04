@@ -46,8 +46,10 @@ public class Gui extends JFrame {
 		
 		msgBox = new JTextArea();
 		msgBox.setEditable(false);
+		msgBox.setLineWrap(true);
 		spane = new JScrollPane(msgBox, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		spane.setBounds(615, 570, 165, 250);
+		add(spane);
 		
 			
 		JMenuBar mbar = new JMenuBar();
@@ -128,9 +130,10 @@ public class Gui extends JFrame {
 				game.test(1);
 			}
 		});
-		mainFrm.add(test);
+		add(test);
+		//---------------------END TEMP-----------------
 		
-		ready = new JButton("Готово");
+		ready = new JButton("Завершить");
 		ready.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.ready();
@@ -138,14 +141,10 @@ public class Gui extends JFrame {
 		});
 		ready.setBounds(615, 50, 165, 25);
 		ready.setVisible(false);
-		
+		add(ready);
 		
 		importImages();
-		mainFrm.add(spane);
-		mainFrm.add(ready);
 		emptyField();
-		
-		createErrorFrm();
 		setVisible(true);
 	}
 	
@@ -221,7 +220,7 @@ public class Gui extends JFrame {
 	}
 	
 	public void addMsg(String s) {
-		msgBox.append(s+"\n");
+		msgBox.append("> "+s+"\n");
 	}
 	
 	public void showError(String s) {
@@ -235,24 +234,6 @@ public class Gui extends JFrame {
 	
 	public void showReadyButton(boolean visible){
 		ready.setVisible(visible);
-	}
-	
-	private void createErrorFrm() {
-		errorFrm = new JFrame("Ошибка");
-		errorLbl = new JLabel("Какая-то ошибка");
-		JButton ok= new JButton("Ok");
-		errorFrm.setBounds(400, 400, 240, 100);
-		errorFrm.setLayout(new BoxLayout(errorFrm.getContentPane(), BoxLayout.Y_AXIS));
-		
-		ok.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				errorFrm.setVisible(false);
-			}
-		});
-		ok.setAlignmentX(Component.CENTER_ALIGNMENT);
-		errorLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
-		errorFrm.add(errorLbl);
-		errorFrm.add(ok);
 	}
 	
 	private void importImages() {

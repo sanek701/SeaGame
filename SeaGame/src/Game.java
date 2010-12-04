@@ -1,6 +1,6 @@
 
 public class Game {
-	enum State {WAITING, CREATESHIPS, MOVE}
+	enum State {WAITING, CREATESHIPS, MOVE, ASK}
 	final static int[] normalShipCnt = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
 	int[] shipCnt =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int shipSum = 0;
@@ -37,7 +37,8 @@ public class Game {
 		if(type > 0) { 
 			shipCnt[type] += 1;
 			shipSum += 1;
-			if(shipSum == 52) gui.showReadyButton(true);
+			if(shipSum == 52)
+				gui.showReadyButton(true);
 		}
 		setShip(x, y, type);
 	}
@@ -45,7 +46,8 @@ public class Game {
 	public void deleteShip(int x, int y) {
 		int type = getShip(x, y).type;
 		if(type > 0) { // our ship
-			if(shipSum == 52) gui.showReadyButton(false);
+			if(shipSum == 52)
+				gui.showReadyButton(false);
 			shipSum -= 1;
 			shipCnt[type] -= 1;
 		}
@@ -53,13 +55,21 @@ public class Game {
 		setShip(x, y, -1);
 	}
 	
-	public void moveShip() {
-		
-	}
-	
 	public void setState(String str) {
 		State st = Enum.valueOf(State.class, str);
 		state = st;
+		switch(state) {
+			case CREATESHIPS:
+				gui.addMsg("Расставьте свои корабли");
+				break;
+			case MOVE:
+				gui.addMsg("Ваш ход");
+				break;
+			case ASK:
+				gui.addMsg("Ход сделан. Вы можете спросить корабль противника.");
+				gui.showReadyButton(true);
+				break;
+		}
 	}
 	
 	public void test(int p) {

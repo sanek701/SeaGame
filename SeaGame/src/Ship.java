@@ -10,13 +10,13 @@ public class Ship extends JComponent {
 	static Game game = null;
 	static Image[] lib = null;
 	static Ship oldPosition = null;
+	static Ship[] block = {null, null, null};
 	int x, y, type;
 	boolean selected, enemy;
-	enum Type {L, K, E, S, TK, TR, PL, F, A, T, M}
 	
 	public Ship(int t, int i, int j) {
-		x = j;
 		y = i;
+		x = j;
 		type = t;
 		final Ship thisShip = this;
 		
@@ -40,12 +40,29 @@ public class Ship extends JComponent {
 						} else {
 							if(oldPosition != thisShip) {
 								if(type!=-1) break; //Not an empty field
-								game.srv.moveShip(oldPosition.y, oldPosition.x, x, y);
+								game.srv.moveShip(oldPosition.y, oldPosition.x, y, x);
+								oldPosition.selected = false;
+								oldPosition.repaint();
 							}
 							
 							oldPosition = null;
 							selected = false;
 							repaint();
+						}
+						break;
+					case ASK:
+						if(type==0) { //Enemy
+							game.srv.askShip(block, thisShip);
+							freeBlock();
+							break;
+						}
+						
+						if(selected) {
+							deleteFromBlock(thisShip);
+						} else {
+							if(!fullBlock() && type>0) {
+								addToBlock(thisShip);
+							}
 						}
 						break;
 				}
@@ -54,7 +71,7 @@ public class Ship extends JComponent {
 	}
 	
 	public void paint(Graphics g) {
-		Color c=g.getColor();
+		Color c = g.getColor();
 		if(y>=0) g.setColor(Color.blue);
 		if(y>=5) g.setColor(Color.black);
 		if(y>=10) g.setColor(Color.blue);
@@ -72,7 +89,7 @@ public class Ship extends JComponent {
 	}
 	
 	public void setType(int t){
-		type=t;
+		type = t;
 		repaint();
 	}
 	
@@ -82,5 +99,43 @@ public class Ship extends JComponent {
 	
 	public static void setLib(Image[] l) {
 		lib = l;
+	}
+	
+	private boolean fullBlock() {
+		if(block[0]!=null && block[1]!=null
+				&& block[2]!=null) return true;
+		return false;
+	}
+	
+	private void addToBlock(Ship s) {
+		for(int i=0; i<3; i++) {
+			if(block[i]==null) {
+				block[i] = s;
+				s.selected = true;
+				s.repaint();
+				return;
+			}
+		}
+	}
+	
+	private void deleteFromBlock(Ship s) {
+		for(int i=0; i<3; i++) {
+			if(block[i]==s) {
+				block[i] = null;
+				s.selected = false;
+				s.repaint();
+				return;
+			}
+		}
+	}
+	
+	public void freeBlock() {
+		for(int i=0; i<3; i++) {
+			if(block[i]!=null) {
+				block[i].selected = false;
+				block[i].repaint();
+				block[i] = null;
+			}
+		}
 	}
 }

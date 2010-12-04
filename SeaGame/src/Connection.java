@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Connection implements Runnable {
-	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL, STATE, READY, MOVE}
+	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL, STATE, READY, MOVE, ASK}
 	
 	Socket sock;
 	BufferedReader in;
@@ -48,10 +48,24 @@ public class Connection implements Runnable {
 		request(Command.READY, null);
 	}
 	
-	public void moveShip(int i, int j, int x, int y) {
+	public void moveShip(int i, int j, int y, int x) {
 		String[] req = {Integer.toString(i), Integer.toString(j),
-						Integer.toString(x), Integer.toString(y)};
+						Integer.toString(y), Integer.toString(x)};
 		request(Command.MOVE, req);
+	}
+	
+	public void askShip(Ship[] ourShips, Ship enemyShip) {
+		String our="";
+		String enemy="";
+		
+		for(int i=0; i<ourShips.length; i++) {
+			if(ourShips[i]==null) continue;
+			our += ourShips[i].y+","+ourShips[i].x+"+";
+		}
+		enemy = enemyShip.y+","+enemyShip.x;
+		
+		String[] req = {our, enemy};
+		request(Command.ASK, req);
 	}
 	
 	public void run() {
@@ -77,7 +91,7 @@ public class Connection implements Runnable {
 					game.gui.addMsg(args[1]);
 					break;
 				case QUIT:
-					close();
+					game.exit();
 					break;
 				case SET:
 					x = Integer.parseInt(args[1]);
@@ -151,7 +165,6 @@ public class Connection implements Runnable {
 	}
 	
 	public void close() {
-		System.out.println("Connection.close()");
 		try {
 			sock.shutdownInput();
 			sock.shutdownOutput();
@@ -159,7 +172,5 @@ public class Connection implements Runnable {
 		} catch(Exception e) {
 			// ну и фиг
 		}
-		System.out.println("Connection.close() done");
-		//game.over();
 	}
 }
