@@ -124,7 +124,7 @@ public class Game {
 		}
 	}
 	
-	public void moveShip(Client p, int i, int j, int x, int y) {
+	public void moveShip(Client p, int i, int j, int y, int x) {
 		if(state!=State.MOVE) return;
 		
 		 i = p.y(i); y = p.y(y);
@@ -137,7 +137,7 @@ public class Game {
 		 }
 
 		 if(dist == 1.0) {
-		     if(type == 11 && checkTral(i,j) && checkTral(y,x)) {
+		     if(type == 11 && checkTral(p, i, j) && checkTral(p, y, x)) {
 		    	 acceptMove(p, i, j, y, x, type);
 			 }else if (type != 8 && type != 11) {
 				 acceptMove(p, i, j, y, x, type);
@@ -215,7 +215,7 @@ public class Game {
 		return Math.sqrt( (double)(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)); 
 	}
 	
-	private boolean checkTral(int i,int j) {
+	private boolean checkTral(Client p,int i,int j) {
 		int k, t;
 		int top = i-1;
 		int bottom = i+1;
@@ -226,11 +226,11 @@ public class Game {
 		if ((i+1) > 14) bottom = 14;
 		if ((j-1) < 0) left = 0;
 		if ((j+1) > 15)right = 15;
-		//System.out.println(top+" "+bottom+" "+left+" "+right);
+		
 		for(k = top; k <= bottom; k++) {
 			for(t = left; t <= right; t++) {
-				//System.out.println(k+" "+t);
-				if (field[k][t]!= null && field[k][t].type == 5) return true;
+				if (field[k][t]!= null && field[k][t].type == 5 && field[k][t].owner == p) 
+					return true;
 			}
 		}
 		
@@ -253,6 +253,13 @@ public class Game {
 	}
 	
 	private boolean blockIsPossible(Client p, int i, int j) {
+		int t = field[i][j].type;
+		
+		if(i-1 >= 0  && field[i-1][j].type == t && field[i-1][j].owner == p) return true;
+		if(i+1 <= 14 && field[i+1][j].type == t && field[i+1][j].owner == p) return true;
+		if(j-1 >= 0  && field[i][j-1].type == t && field[i][j-1].owner == p) return true;
+		if(j+1 <= 15 && field[i][j+1].type == t && field[i][j+1].owner == p) return true;
+		
 		return false;
 	}
 }
