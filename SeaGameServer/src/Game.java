@@ -87,6 +87,7 @@ public class Game {
 					p1.setState("MOVE");
 					p2.setState("WAITING");
 				}
+				state = State.MOVE;
 				break;
 		}
 	}
