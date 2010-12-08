@@ -10,6 +10,7 @@ public class Game {
 	static int[] shipPower = {0, 0};
 	static HashMap<Integer, Game> games = new HashMap<Integer, Game>();
 	static int gameCount = 0;
+	private static int[] rateShipPower = {3, -2 , -4}; //магические чиселки для вычисления мощности блока
 	
 	Client p1=null, p2=null;
 	public String name;
@@ -138,7 +139,7 @@ public class Game {
 		 }
 
 		 if(dist == 1.0) {
-		     if(type == 11 && checkTral(p, i, j) && checkTral(p, y, x)) {
+		     if(type == 11 && checkTral(p, i, j, y, x)) {
 		    	 acceptMove(p, i, j, y, x, type);
 			 }else if (type != 8 && type != 11) {
 				 acceptMove(p, i, j, y, x, type);
@@ -185,6 +186,34 @@ public class Game {
 		
 	}
 	
+	public void bomb(Client p){
+		int bi = 0, bj= 0,k ,t, top, bottom, right, left; 
+		
+		for(bi = 0; bi < 15; bi++){
+			for(bj = 0; bj < 16; bj ++){
+				if(field[bi][bj] != null && field[bi][bj].type == 9 && field[bi][bj].owner == p)
+					break;
+			}
+		}
+		
+		top = bi-2;
+		bottom = bi+2;
+		right = bj+2;
+		left = bj-2;
+		if (top < 0) top = 0;
+		if (bottom > 14) bottom = 14;
+		if (left < 0) left = 0;
+		if (right > 15)right = 15;
+		
+		for(k = top; k <= bottom; k++) {
+			for(t = left; t <= right; t++) {
+				if (field[k][t]!= null){
+					//удалить корабль
+				}
+			}
+		}
+	}
+	
 	public static String gameList() {
 		Set<Map.Entry<Integer, Game>> s = games.entrySet();
 		String result = "";
@@ -212,11 +241,17 @@ public class Game {
 			games.remove(id);
 	}
 	
+	private int compareBlocks(Ship[] block1, Ship[] block2){
+		int power1 = rateShipPower[block1.length-1]+block1[0].type*3;
+		int power2 = rateShipPower[block2.length-1]+block2[0].type*3;
+		return signum(power1-power2);//-1-> 1<2; 0-> 1=2; 1-> 1>2; 
+	}
+	
 	private double distance(int x1, int y1, int x2, int y2) {
 		return Math.sqrt( (double)(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)); 
 	}
 	
-	private boolean checkTral(Client p,int i,int j) {
+	private boolean checkTral(Client p,int i,int j, int y, int x) {
 		int k, t;
 		int top = i-1;
 		int bottom = i+1;
@@ -230,8 +265,9 @@ public class Game {
 		
 		for(k = top; k <= bottom; k++) {
 			for(t = left; t <= right; t++) {
-				if (field[k][t]!= null && field[k][t].type == 5 && field[k][t].owner == p) 
-					return true;
+				if (field[k][t]!= null && field[k][t].type == 5 && field[k][t].owner == p){ //нашли тральщика
+					if(abs(k-y)<=1 && abs(t-x)<=1) return true;
+				}
 			}
 		}
 		
@@ -256,10 +292,14 @@ public class Game {
 	private boolean blockIsPossible(Client p, int i, int j) {
 		int t = field[i][j].type;
 		
-		if(i-1 >= 0  && field[i-1][j].type == t && field[i-1][j].owner == p) return true;
-		if(i+1 <= 14 && field[i+1][j].type == t && field[i+1][j].owner == p) return true;
-		if(j-1 >= 0  && field[i][j-1].type == t && field[i][j-1].owner == p) return true;
-		if(j+1 <= 15 && field[i][j+1].type == t && field[i][j+1].owner == p) return true;
+		if(i-1 >= 0 && field[i-1][j] != null &&
+				field[i-1][j].type == t && field[i-1][j].owner == p) return true;
+		if(i+1 <= 14 && field[i+1][j] != null && 
+				field[i+1][j].type == t && field[i+1][j].owner == p) return true;
+		if(j-1 >= 0  && field[i][j-1] != null && 
+				field[i][j-1].type == t && field[i][j-1].owner == p) return true;
+		if(j+1 <= 15 && field[i][j+1] != null &&
+				field[i][j+1].type == t && field[i][j+1].owner == p) return true;
 		
 		return false;
 	}
