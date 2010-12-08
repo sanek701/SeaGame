@@ -11,8 +11,9 @@ public class Ship extends JComponent {
 	static Image[] lib = null;
 	static Ship oldPosition = null;
 	static Ship[] block = {null, null, null};
+	static Ship attacker = null;
 	int x, y, type;
-	boolean selected, enemy;
+	boolean selected;
 	
 	public Ship(int t, int i, int j) {
 		y = i;
@@ -52,17 +53,38 @@ public class Ship extends JComponent {
 						break;
 					case ASK:
 						if(type==0) { //Enemy
-							game.srv.askShip(block, thisShip);
-							freeBlock();
+							game.srv.askShip(attacker.y, attacker.x,
+									thisShip.y, thisShip.x);
+							attacker.selected = false;
+							attacker.repaint();
+							attacker = null;
 							break;
 						}
 						
 						if(selected) {
+							attacker.selected = false;
+							attacker.repaint();
+							attacker = null;
+						} else {
+							if(type<=0) break;
+							if(attacker!=null) {
+								attacker.selected = false;
+								attacker.repaint();
+							}
+							attacker = thisShip;
+							attacker.selected = true;
+							attacker.repaint();
+						}
+						break;
+					case ANS:
+						if(selected) {
+							if(thisShip == block[0])
+								break;
 							deleteFromBlock(thisShip);
 						} else {
-							if(!fullBlock() && type>0) {
-								addToBlock(thisShip);
-							}
+							if(type<=0 || fullBlock())
+								break;
+							addToBlock(thisShip);
 						}
 						break;
 				}
@@ -78,7 +100,7 @@ public class Ship extends JComponent {
 		if(type!=-1) {
 			g.drawImage(lib[type], 1, 1, 34, 52, this);
 		}
-		if(selected || enemy) {
+		if(selected) {
 			g.setColor(Color.red);
 			g.drawRect(1, 1, 34, 54);
 		} else {

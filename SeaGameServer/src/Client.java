@@ -8,7 +8,8 @@ public class Client implements Runnable {
 	BufferedReader in;
 	PrintWriter out;
 	
-	public enum Command {BAD, NEW, JOIN, GAMELIST, SET, DEL, READY, MOVE, ASK}
+	public enum Command {BAD, NEW, JOIN, GAMELIST, SET,
+		DEL, READY, MOVE, ASK, ANS}
 	
 	public int[] ShipCount = new int[10];
 	public boolean ready;
@@ -96,7 +97,12 @@ public class Client implements Runnable {
 							Integer.parseInt(args[3]),Integer.parseInt(args[4]));
 					break;
 				case ASK:
-					write("MSG;ASK;");
+					game.ask(this, Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+							Integer.parseInt(args[3]),Integer.parseInt(args[4]));
+					break;
+				case ANS:
+					game.ans(this, args[1].split("+"));
+					sndMsg("DONE");
 					break;
 			}
 		}

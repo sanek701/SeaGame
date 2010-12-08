@@ -4,7 +4,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Connection implements Runnable {
-	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL, STATE, READY, MOVE, ASK}
+	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL,
+		STATE, READY, MOVE, ASK, ANS}
 	
 	Socket sock;
 	BufferedReader in;
@@ -54,18 +55,20 @@ public class Connection implements Runnable {
 		request(Command.MOVE, req);
 	}
 	
-	public void askShip(Ship[] ourShips, Ship enemyShip) {
-		String our="";
-		String enemy="";
-		
-		for(int i=0; i<ourShips.length; i++) {
-			if(ourShips[i]==null) continue;
-			our += ourShips[i].y+","+ourShips[i].x+"+";
-		}
-		enemy = enemyShip.y+","+enemyShip.x;
-		
-		String[] req = {our, enemy};
+	public void askShip(int i, int j, int y, int x) {
+		String[] req = {Integer.toString(i), Integer.toString(j),
+				Integer.toString(y), Integer.toString(x)};
 		request(Command.ASK, req);
+	}
+	
+	public void ans(Ship[] block) {
+		String ans = "";
+		 for(int i=0; i<block.length; i++) {
+			 if(block[i]==null) continue;
+			 ans += block[i].y+","+block[i].x+"+";
+		}
+		String[] req = {ans};
+		request(Command.ANS, req);
 	}
 	
 	public void run() {
@@ -94,18 +97,23 @@ public class Connection implements Runnable {
 					game.exit();
 					break;
 				case SET:
-					x = Integer.parseInt(args[1]);
-					y = Integer.parseInt(args[2]);
+					y = Integer.parseInt(args[1]);
+					x = Integer.parseInt(args[2]);
 					t = Integer.parseInt(args[3]);
-					game.createShip(x, y, t);
+					game.createShip(y, x, t);
 					break;
 				case DEL:
-					x = Integer.parseInt(args[1]);
-					y = Integer.parseInt(args[2]);
-					game.deleteShip(x, y);
+					y = Integer.parseInt(args[1]);
+					x = Integer.parseInt(args[2]);
+					game.deleteShip(y, x);
 					break;
 				case STATE:
 					game.setState(args[1]);
+					break;
+				case ANS:
+					y = Integer.parseInt(args[1]);
+					x = Integer.parseInt(args[2]);
+					game.ans(y, x);
 					break;
 			}
 		}

@@ -1,6 +1,6 @@
 
 public class Game {
-	enum State {WAITING, CREATESHIPS, MOVE, ASK}
+	enum State {WAITING, CREATESHIPS, MOVE, ASK, ANS}
 	final static int[] normalShipCnt = {-1, 2, 5, 6, 6, 6, 6, 6, 2, 1, 6, 6};
 	int[] shipCnt =  {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int shipSum = 0;
@@ -29,8 +29,13 @@ public class Game {
 	}
 	
 	public void ready() {
-		srv.plReady();
 		gui.showReadyButton(false);
+		
+		if(state == State.ANS) {
+			srv.ans(Ship.block);
+		} else {
+			srv.plReady();
+		}
 	}
 	
 	public void createShip(int x, int y, int type) {
@@ -70,6 +75,16 @@ public class Game {
 				gui.showReadyButton(true);
 				break;
 		}
+	}
+	
+	public void ans(int y, int x) {
+		Ship t = gui.field[y][x];
+		Ship.block[0] = t;
+		t.selected = true;
+		t.repaint();
+		
+		gui.showReadyButton(true);
+		state = State.ANS;
 	}
 	
 	public void test(int p) {

@@ -5,7 +5,7 @@ import java.util.Map;
 
 
 public class Game {
-	public enum State{NEW, CONNECTED, MOVE, ASK}
+	public enum State{NEW, CONNECTED, MOVE, ASK, ANS}
 	
 	static int[] shipPower = {0, 0};
 	static HashMap<Integer, Game> games = new HashMap<Integer, Game>();
@@ -16,10 +16,10 @@ public class Game {
 	public String name;
 	State state = State.NEW;
 	Ship[][] field = new Ship[15][16];
-	int[][] attackers, defenders;
 	int id;
 	int playersReady = 0;
 	int order = 0;
+	int[] atdef = new int[4];
 	
 	public Game(Client p, String pName, String gName) {
 		name = gName;
@@ -174,15 +174,22 @@ public class Game {
 		p.setState("ASK");
 	}
 	
-	public void ask(Client p, int[][] attackers, int i, int j) {
+	public void ask(Client p, int i, int j, int y, int x) {
 		if(state!=State.ASK) return;
+		i = p.y(i); y = p.y(y);
+		Client op = opponent(p);
 		
-		if(blockIsPossible(opponent(p), i, j)) {
-			
+		if(blockIsPossible(op, i, j)) {
+			atdef[0] = i;
+			atdef[1] = j;
+			atdef[2] = y;
+			atdef[3] = x;
+			state = State.ANS;
+			op.sndMsg("ANS;"+op.y(y)+";"+x+";");
 		}
 	}
 	
-	public void setDefenders(Client p, int[][] defenders) {
+	public void ans(Client p, String[] block) {
 		
 	}
 	
@@ -241,7 +248,7 @@ public class Game {
 			games.remove(id);
 	}
 	
-	private int compareBlocks(Ship[] block1, Ship[] block2){
+	private int compareBlocks(Ship[] block1, Ship[] block2) {
 		int power1 = rateShipPower[block1.length-1]+block1[0].type*3;
 		int power2 = rateShipPower[block2.length-1]+block2[0].type*3;
 		return signum(power1-power2);//-1-> 1<2; 0-> 1=2; 1-> 1>2; 
