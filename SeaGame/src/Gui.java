@@ -27,7 +27,7 @@ public class Gui extends JFrame {
 	JLabel errorLbl;
 	JTextArea msgBox;
 	JScrollPane spane;
-	JButton ready, test, test1;
+	JButton ready, test;
 	Gui mainFrm;
 	Game game = null;
 	Ship[][] field = new Ship[15][16];

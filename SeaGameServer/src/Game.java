@@ -179,19 +179,120 @@ public class Game {
 		i = p.y(i); y = p.y(y);
 		Client op = opponent(p);
 		
-		if(blockIsPossible(op, i, j)) {
+		if(distance(i,j,y,x) != 1){
+			p.sndMsg("Вопрос не корректный");
+			return;
+		} 
+		
+		if(blockIsPossible(op, y, x)) {
 			atdef[0] = i;
 			atdef[1] = j;
 			atdef[2] = y;
 			atdef[3] = x;
 			state = State.ANS;
 			op.sndMsg("ANS;"+op.y(y)+";"+x+";");
+			return;
+		}
+		
+		int attackerLength = findBlock(p,i,j,0);
+		int result = compareBlocks(attackerLength, field[i][j].type, 1, field[y][x].type);
+		switch(result){//что когда делаем
+			case 1://win
+				field[y][x] = null;
+				p.deleteShip(y, x);
+				opponent(p).deleteShip(y, x);
+				break;
+			case -1://loss
+				field[i][j] = null;
+				p.deleteShip(i, j);
+				opponent(p).deleteShip(i, j);
+				break;
+			case 0://equal
+				field[y][x] = null;
+				p.deleteShip(y, x);
+				opponent(p).deleteShip(y, x);
+				field[i][j] = null;
+				p.deleteShip(i, j);
+				opponent(p).deleteShip(i, j);
+				break;
 		}
 	}
 	
 	public void ans(Client p, String[] block) {
+		int k;
+		String[] sh;
+		int[][] defenders = new int[block.length][2];
 		
+		for(k=0; k < block.length; k++){
+			sh = block[k].split(",");
+			defenders[k][0] = Integer.parseInt(sh[0]);
+			defenders[k][0] = Integer.parseInt(sh[1]);
+		}
+		
+		if(!IsBlockCorrect(defenders)){
+			p.sndMsg("Неправильный блок");
+			return;
+		}
 	}
+	
+	private boolean IsBlockCorrect(int[][] block){
+		if(block[0][0] == atdef[2] && block[0][0] == atdef[3]){
+			return false;
+		}
+		
+		switch(block.length){
+			case 1:
+				return true;
+			case 2:
+				if(distance(block[0][0],block[0][1],block[1][0],block[1][1]) == 1 )
+					return true;
+				break;
+			case 3:
+				double d12 = distance(block[0][0],block[0][1],block[1][0],block[1][1]);
+				double d13 = distance(block[0][0],block[0][1],block[2][0],block[2][1]);
+				double d23 = distance(block[1][0],block[1][1],block[2][0],block[2][1]);
+				
+				if( (d12==1 && d13==1) || (d12==1 && d23==1) || (d13==1 && d23==1))
+					return true;
+				break;
+		}
+		
+		return false;
+	}
+	
+	private int findBlock(Client p, int i, int j, int step){
+		int len = 1;
+		int t = field[i][j].type;
+		int[][] coordinates = new int[3][2];
+		coordinates[0][0]=i;
+		coordinates[0][1]=j;
+	
+		if(i-1 >= 0 && field[i-1][j]!=null && field[i-1][j].owner==p && field[i-1][j].type == t){
+			len+=1;
+			coordinates[len-1][0]=i-1;
+			coordinates[len-1][1]=j;
+		}
+		if(j-1 >= 0 && field[i][j-1]!=null && field[i][j-1].owner==p && field[i][j-1].type == t){
+			len+=1;
+			coordinates[len-1][0]=i;
+			coordinates[len-1][1]=j-1;
+		}
+		if(i+1 <= 14 && field[i+1][j]!=null && field[i+1][j].owner==p && field[i+1][j].type == t){
+			len+=1;
+		}
+		if(j+1 <= 15 && field[i][j-1]!=null && field[i][j+1].owner==p && field[i][j+1].type == t){
+			len+=1;
+			coordinates[len-1][0]=i;
+			coordinates[len-1][1]=j+1;
+		}
+		
+		if(len==2 && step != 1){
+			return findBlock(p, coordinates[len-1][0], coordinates[len-1][1], 1);
+		}
+		
+		if(len > 3) return 3;
+		return len;
+	} 
 	
 	public void bomb(Client p){
 		int bi = 0, bj= 0,k ,t, top, bottom, right, left; 
@@ -248,10 +349,10 @@ public class Game {
 			games.remove(id);
 	}
 	
-	private int compareBlocks(Ship[] block1, Ship[] block2) {
-		int power1 = rateShipPower[block1.length-1]+block1[0].type*3;
-		int power2 = rateShipPower[block2.length-1]+block2[0].type*3;
-		return signum(power1-power2);//-1-> 1<2; 0-> 1=2; 1-> 1>2; 
+	private int compareBlocks(int l1, int type1, int l2, int type2) {
+		int power1 = rateShipPower[l1-1]+type1*3;
+		int power2 = rateShipPower[l2-1]+type2*3;
+		return signum(power2-power1); 
 	}
 	
 	private double distance(int x1, int y1, int x2, int y2) {
