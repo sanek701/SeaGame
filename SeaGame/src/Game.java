@@ -33,6 +33,7 @@ public class Game {
 		
 		if(state == State.ANS) {
 			srv.ans(Ship.block);
+			Ship.freeBlock();
 		} else {
 			srv.plReady();
 		}
@@ -73,6 +74,10 @@ public class Game {
 			case ASK:
 				gui.addMsg("Ход сделан. Вы можете спросить корабль противника.");
 				gui.showReadyButton(true);
+				break;
+			case WAITING:
+				gui.addMsg("Ход сделан. Подождите.");
+				gui.showReadyButton(false);
 				break;
 		}
 	}
