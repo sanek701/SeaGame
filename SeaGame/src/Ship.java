@@ -52,8 +52,8 @@ public class Ship extends JComponent {
 						}
 						break;
 					case ASK:
-						if(type==0) { //Enemy
-							game.srv.askShip(attacker.y, attacker.x,
+						if(type==0 && attacker!=null) { //Ask enemy
+							game.askShip(attacker.y, attacker.x,
 									thisShip.y, thisShip.x);
 							attacker.selected = false;
 							attacker.repaint();
@@ -151,7 +151,7 @@ public class Ship extends JComponent {
 		}
 	}
 	
-	public void freeBlock() {
+	public static void freeBlock() {
 		for(int i=0; i<3; i++) {
 			if(block[i]!=null) {
 				block[i].selected = false;

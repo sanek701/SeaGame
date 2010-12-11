@@ -101,8 +101,7 @@ public class Client implements Runnable {
 							Integer.parseInt(args[3]),Integer.parseInt(args[4]));
 					break;
 				case ANS:
-					game.ans(this, args[1].split("+"));
-					sndMsg("DONE");
+					game.ans(this, args[1].split("#"));
 					break;
 			}
 		}

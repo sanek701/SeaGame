@@ -63,9 +63,9 @@ public class Connection implements Runnable {
 	
 	public void ans(Ship[] block) {
 		String ans = "";
-		 for(int i=0; i<block.length; i++) {
+		 for(int i=0; i<3; i++) {
 			 if(block[i]==null) continue;
-			 ans += block[i].y+","+block[i].x+"+";
+			 ans += block[i].y+","+block[i].x+"#";
 		}
 		String[] req = {ans};
 		request(Command.ANS, req);
@@ -125,6 +125,7 @@ public class Connection implements Runnable {
 			line = in.readLine().trim();
 		} catch(Exception e) {
 			e.printStackTrace();
+			game.exit();
 			return null;
 		}
 		System.out.println("<- "+line); //debug

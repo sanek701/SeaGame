@@ -22,9 +22,10 @@ public class Game {
 	}
 	
 	public void exit() {
-		Ship.setGame(null);
 		gui.setGame(null);
 		gui.emptyField();
+		gui.showReadyButton(false);
+		Ship.setGame(null);
 		srv.close();
 	}
 	
@@ -32,6 +33,8 @@ public class Game {
 		gui.showReadyButton(false);
 		
 		if(state == State.ANS) {
+			state = State.WAITING;
+			gui.showReadyButton(false);
 			srv.ans(Ship.block);
 			Ship.freeBlock();
 		} else {
@@ -59,6 +62,12 @@ public class Game {
 		}
 		
 		setShip(x, y, -1);
+	}
+	
+	public void askShip(int i, int j, int y, int x) {
+		state = State.WAITING;
+		gui.showReadyButton(false);
+		srv.askShip(i, j, y, x);
 	}
 	
 	public void setState(String str) {

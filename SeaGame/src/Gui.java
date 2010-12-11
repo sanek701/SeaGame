@@ -144,11 +144,11 @@ public class Gui extends JFrame {
 		add(ready);
 		
 		importImages();
-		emptyField();
+		initField();
 		setVisible(true);
 	}
 	
-	public void emptyField() {
+	private void initField() {
 		int i, j;
 		for(i=0; i<15; i++) {
 			for(j=0; j<16; j++) {
@@ -156,6 +156,15 @@ public class Gui extends JFrame {
 				field[i][j] = t;
 				t.setBounds(j*36+30, i*54+16, 36, 54);
 				add(t);
+			}
+		}
+	}
+	
+	public void emptyField() {
+		int i, j;
+		for(i=0; i<15; i++) {
+			for(j=0; j<16; j++) {
+				field[i][j].setType(-1);
 			}
 		}
 	}
@@ -221,6 +230,7 @@ public class Gui extends JFrame {
 	
 	public void addMsg(String s) {
 		msgBox.append("> "+s+"\n");
+		msgBox.setCaretPosition(msgBox.getDocument().getLength());
 	}
 	
 	public void showError(String s) {
