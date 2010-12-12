@@ -27,7 +27,7 @@ public class Gui extends JFrame {
 	JLabel errorLbl;
 	JTextArea msgBox;
 	JScrollPane spane;
-	JButton ready, test;
+	JButton ready, test, bombButton;
 	Gui mainFrm;
 	Game game = null;
 	Ship[][] field = new Ship[15][16];
@@ -143,6 +143,21 @@ public class Gui extends JFrame {
 		ready.setVisible(false);
 		add(ready);
 		
+		bombButton = new JButton("Бомба");
+		bombButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (game.state.toString() == "MOVE") {
+					game.srv.bomb();
+					bombButton.setVisible(false);
+				} else {
+					addMsg("Сейчас не Ваш ход");
+				}
+			}
+		});
+		bombButton.setBounds(615, 100, 165, 25);
+		bombButton.setVisible(true);
+		add(bombButton);
+		
 		importImages();
 		initField();
 		setVisible(true);
@@ -175,7 +190,7 @@ public class Gui extends JFrame {
 		JRadioButton[] type = new JRadioButton[11];
 		ButtonGroup bg = new ButtonGroup();
 		createShipFrm.setLayout(new BoxLayout(createShipFrm.getContentPane(), BoxLayout.Y_AXIS));
-		createShipFrm.setBounds(200,200,250,270);
+		createShipFrm.setBounds(200,200,250,280);
 			
 		final int p = x;
 		final int q = y;

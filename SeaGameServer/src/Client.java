@@ -9,7 +9,7 @@ public class Client implements Runnable {
 	PrintWriter out;
 	
 	public enum Command {BAD, NEW, JOIN, GAMELIST, SET,
-		DEL, READY, MOVE, ASK, ANS}
+		DEL, READY, MOVE, ASK, ANS, BOMB}
 	
 	public int[] ShipCount = new int[10];
 	public boolean ready;
@@ -102,6 +102,9 @@ public class Client implements Runnable {
 					break;
 				case ANS:
 					game.ans(this, args[1].split("#"));
+					break;
+				case BOMB:
+					game.bomb(this);
 					break;
 			}
 		}

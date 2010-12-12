@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class Connection implements Runnable {
 	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL,
-		STATE, READY, MOVE, ASK, ANS}
+		STATE, READY, MOVE, ASK, ANS, BOMB ,LOOSE, WIN}
 	
 	Socket sock;
 	BufferedReader in;
@@ -71,6 +71,11 @@ public class Connection implements Runnable {
 		request(Command.ANS, req);
 	}
 	
+	public void bomb(){
+		String[] req = {""};
+		request(Command.BOMB, req);
+	}
+	
 	public void run() {
 		String str;
 		String[] args;
@@ -114,6 +119,10 @@ public class Connection implements Runnable {
 					y = Integer.parseInt(args[1]);
 					x = Integer.parseInt(args[2]);
 					game.ans(y, x);
+					break;
+				case LOOSE:
+					break;
+				case WIN:
 					break;
 			}
 		}

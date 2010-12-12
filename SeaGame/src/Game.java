@@ -25,6 +25,7 @@ public class Game {
 		gui.setGame(null);
 		gui.emptyField();
 		gui.showReadyButton(false);
+		gui.bombButton.setVisible(true);
 		Ship.setGame(null);
 		srv.close();
 	}
@@ -85,7 +86,7 @@ public class Game {
 				gui.showReadyButton(true);
 				break;
 			case WAITING:
-				gui.addMsg("Ход сделан. Подождите.");
+				gui.addMsg("Подождите.");
 				gui.showReadyButton(false);
 				break;
 		}
