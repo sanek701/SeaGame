@@ -186,14 +186,18 @@ public class Game {
 			return;
 		} 
 	
-		if(field[y][x].type == 9){
-			bomb(op);
+		if(field[y][x].type == 9) {  // Спросили атомную бомбу
+			proceedBomb(op);
 			changeOrder(true);
 			return;
-		} else if (field[i][j].type == 10 || field[y][x].type == 10) {
-			if (field[y][x].type == 8) {
+		} else if (field[i][j].type == 10 || field[y][x].type == 10) { //Спросили торпеду или торпедой
+			if(field[y][x].type == 8) { //спросили форт торпедой
 				p.sndMsg("Вы нашли форт противника (" + Integer.toString(y)+","+Integer.toString(x)+")");
-			} else {
+				field[i][j] = null;
+				p.deleteShip(i, j);
+				op.deleteShip(i, j);
+				changeOrder(false);
+			} else { // Торпедой спросили торпеду
 				field[y][x] = null;
 				p.deleteShip(y, x);
 				op.deleteShip(y, x);
@@ -203,21 +207,23 @@ public class Game {
 				changeOrder(true);
 			}
 			return;
-		}else if (field[y][x].type == 11) {//Спросили мину
+		} else if (field[y][x].type == 11) { // Спросили мину
 			p.sndMsg("Это МИНА");
-			if (field[i][j].type == 6) {
+			if (field[i][j].type == 6) { // Тральщик спросил мину, снимает ее с поля
 				field[y][x] = null;
 				p.deleteShip(y, x);
-				opponent(p).deleteShip(y, x);
+				op.deleteShip(y, x);
 				changeOrder(false);
-			}else{
+			} else { // Спросивший корабль подорвался на мине
 				field[i][j] = null;
 				p.deleteShip(i, j);
-				opponent(p).deleteShip(i, j);
+				op.deleteShip(i, j);
 				changeOrder(true);
 			}
 			return;
-		}else if(field[y][x].type == 8){
+		} else if(field[y][x].type == 8) { //Cпросили форт боевым кораблем
+			p.deleteShip(y, x);
+			op.deleteShip(y, x);
 			killFort(p);
 			changeOrder(false);
 			return;
@@ -226,8 +232,8 @@ public class Game {
 		if(blockIsPossible(op, y, x)) {
 			atdef[0] = i;
 			atdef[1] = j;
-			attackers[0][0]=i;
-			attackers[0][1]=j;
+			attackers[0][0] = i;
+			attackers[0][1] = j;
 			atdef[2] = y;
 			atdef[3] = x;
 			state = State.ANS;
@@ -239,7 +245,7 @@ public class Game {
 		int attackerLength = findBlock(p, i, j, 0);
 		int result = compareBlocks(attackerLength, field[i][j].type, 1, field[y][x].type);
 		p.sndMsg("Это " + shipNames[field[y][x].type]);
-		switch(result) { //что когда делаем
+		switch(result) { // что когда делаем
 			case 1: //win
 				field[y][x] = null;
 				p.deleteShip(y, x);
@@ -264,16 +270,16 @@ public class Game {
 		}
 	}
 	
-	private void killFort(Client p){
-		if(p == p1){
-			forts[0]-=1;
-			if(forts[0] == 0){
+	private void killFort(Client p) {
+		if(p == p1) {
+			forts[0] -= 1;
+			if(forts[0] == 0) {
 				p2.write("WIN");
 				p1.write("LOOSE");
 			}
-		}else{
-			forts[1]-=1;
-			if(forts[1] == 0){
+		} else {
+			forts[1] -= 1;
+			if(forts[1] == 0) {
 				p1.write("WIN;");
 				p2.write("LOOSE;");
 			}
@@ -291,32 +297,35 @@ public class Game {
 			defenders[k][1] = Integer.parseInt(sh[1]);
 		}
 		
-		if(!IsBlockCorrect(defenders)) {
-			p.sndMsg("Неправильный блок");
-			return;
-		}
-		
-		
 		i = atdef[0];
 		j = atdef[1];
 		y = defenders[0][0];
 		x = defenders[0][1];
 		
-		int attackerLength = findBlock(opponent(p),i,j,0);
+		if(!IsBlockCorrect(defenders)) {
+			p.sndMsg("Неправильный блок");
+			p.write("ANS;"+p.y(atdef[2])+";"+atdef[3]+";");
+			p.sndMsg("Что это?");
+			return;
+		}
+		
+		int attackerLength = findBlock(opponent(p), i, j, 0);
 		int result = compareBlocks(attackerLength, field[i][j].type, defenders.length, field[y][x].type);
+		
 		opponent(p).sndMsg("Это " + Integer.toString(defenders.length)+ shipNames[field[y][x].type]);
-		switch(result){//что когда делаем
-			case 1://win
+		
+		switch(result) { //что когда делаем
+			case 1: //win
 				deleteBlock(defenders, defenders.length);
 				changeOrder(false);
 				break;
-			case -1://loss
+			case -1: //loss
 				field[i][j] = null;
 				p.deleteShip(i, j);
 				opponent(p).deleteShip(i, j);
 				changeOrder(true);
 				break;
-			case 0://equal
+			case 0: //equal
 				deleteBlock(defenders, defenders.length);
 				deleteBlock(attackers, attackerLength);
 				changeOrder(true);
@@ -324,7 +333,7 @@ public class Game {
 		}
 	}
 	
-	private void changeOrder(boolean changes){
+	private void changeOrder(boolean changes) {
 		if(changes){	
 			if(order==1) {
 				order = 2;
@@ -335,7 +344,7 @@ public class Game {
 				p1.setState("MOVE");
 				p2.setState("WAITING");
 			}
-		}else{
+		} else {
 			if(order==1) { // если в клиенте портятся статусы.
 				p1.setState("MOVE");
 				p2.setState("WAITING");
@@ -377,33 +386,33 @@ public class Game {
 		int len = 1;
 		int t = field[i][j].type;
 
-		if (step == 1){
-			attackers[0][0]=i;
-			attackers[0][1]=j;
+		if (step == 1) {
+			attackers[0][0] = i;
+			attackers[0][1] = j;
 		}
 	
-		if(i-1 >= 0 && field[i-1][j]!=null && field[i-1][j].owner==p && field[i-1][j].type == t){
+		if(i-1 >= 0 && field[i-1][j]!=null && field[i-1][j].owner==p && field[i-1][j].type == t) {
 			len+=1;
-			attackers[len-1][0]=i-1;
-			attackers[len-1][1]=j;
+			attackers[len-1][0] = i-1;
+			attackers[len-1][1] = j;
 		}
-		if(j-1 >= 0 && field[i][j-1]!=null && field[i][j-1].owner==p && field[i][j-1].type == t){
+		if(j-1 >= 0 && field[i][j-1]!=null && field[i][j-1].owner==p && field[i][j-1].type == t) {
 			len+=1;
-			attackers[len-1][0]=i;
-			attackers[len-1][1]=j-1;
+			attackers[len-1][0] = i;
+			attackers[len-1][1] = j-1;
 		}
-		if(i+1 <= 14 && field[i+1][j]!=null && field[i+1][j].owner==p && field[i+1][j].type == t){
+		if(i+1 <= 14 && field[i+1][j]!=null && field[i+1][j].owner==p && field[i+1][j].type == t) {
 			len+=1;
-			attackers[len-1][0]=i+1;
-			attackers[len-1][1]=j;
+			attackers[len-1][0] = i+1;
+			attackers[len-1][1] = j;
 		}
-		if(j+1 <= 15 && field[i][j+1]!=null && field[i][j+1].owner==p && field[i][j+1].type == t){
+		if(j+1 <= 15 && field[i][j+1]!=null && field[i][j+1].owner==p && field[i][j+1].type == t) {
 			len+=1;
-			attackers[len-1][0]=i;
-			attackers[len-1][1]=j+1;
+			attackers[len-1][0] = i;
+			attackers[len-1][1] = j+1;
 		}
 		
-		if(len==2 && step != 1){
+		if(len==2 && step != 1) {
 			return findBlock(p, attackers[len-1][0], attackers[len-1][1], 1);
 		}
 		
@@ -411,55 +420,67 @@ public class Game {
 		return len;
 	} 
 	
-	private void deleteBlock(int[][] block, int len){
-		 int k;
-		 	for(k = 0; k < len; k++) {
-		 		field[block[k][0]][block[k][1]] = null;
-		 		p1.deleteShip(block[k][0],block[k][1]);
-		 		p2.deleteShip(block[k][0],block[k][1]);
-		 	}
+	private void deleteBlock(int[][] block, int len) {
+		 for(int k = 0; k < len; k++) {
+		 	field[block[k][0]][block[k][1]] = null;
+			p1.deleteShip(block[k][0],block[k][1]);
+			p2.deleteShip(block[k][0],block[k][1]);
+		 }
 	}
 	
 	public void bomb(Client p) {
-		int bi = 0, bj = 0, k ,t, top, bottom, right, left;
+		proceedBomb(p);
+		changeOrder(true);
+	}
+	
+	public void proceedBomb(Client p) {
+		int bi = -1, bj = -1, k, t, top, bottom, right, left;
+		Client op = opponent(p);
 		
+		/* find the bomb */
 		for(k=0; k<15; k++) {
 			for(t=0; t<16; t++) {
-				if(field[k][t]!=null && field[k][t].type==9 && field[k][t].owner==p){
+				if(field[k][t]!=null && field[k][t].type==9 && field[k][t].owner==p) {
 					bi = k; bj = t;
 					break;
 				}
 			}
 		}
 		
-//		System.out.println(bi+" "+bj);
+		if(bi<0) return; // Нету бомбы
+		
+		p.write("NOBOMB;"); // Убрать кнопку взрыва бомбы у игрока
+		
 		p.deleteShip(p.y(bi), bj);
-		opponent(p).deleteShip(opponent(p).y(bi), bj);
+		op.deleteShip(op.y(bi), bj);
 		field[bi][bj] = null;
 			
-		top = bi-2;
+		top    = bi-2;
 		bottom = bi+2;
-		right = bj+2;
-		left = bj-2;
+		right  = bj+2;
+		left   = bj-2;
 		
-		if (top < 0) top = 0;
+		if (top < 0)     top = 0;
 		if (bottom > 14) bottom = 14;
-		if (left < 0) left = 0;
-		if (right > 15)right = 15;
+		if (left < 0)    left = 0;
+		if (right > 15)  right = 15;
 		
 		for(k = top; k <= bottom; k++) {
 			for(t = left; t <= right; t++) {
 				if (field[k][t]!= null) {
-					if(field[k][t].type == 9){
-						bomb(opponent(p));
+					if(field[k][t].type == 9) { // Атомная бомба
+						proceedBomb(op);
 					} else {
 						p.deleteShip(k,t);
-						opponent(p).deleteShip(k, t);
-						if(field[k][t].owner == p){
-							opponent(p).sndMsg("Взорвался " + shipNames[field[k][t].type]);
+						op.deleteShip(k, t);
+						if(field[k][t].owner == p) {
+							op.sndMsg("Взорвался " + shipNames[field[k][t].type]);
 						} else {
 							p.sndMsg("Взорвался " + shipNames[field[k][t].type]);
 						}
+						if(field[k][t].type == 8) // Форт
+							killFort(field[k][t].owner);
+						field[k][t] = null;
 					}
 				}
 			}
@@ -472,17 +493,13 @@ public class Game {
 		Iterator<Map.Entry<Integer, Game>> i = s.iterator();
 		while(i.hasNext()) {
 			Map.Entry<Integer, Game>t = i.next();
-			result += t.getKey().toString()+"-"+((Game)t.getValue()).getName()+",";
+			result += t.getKey().toString()+"-"+((Game)t.getValue()).name+",";
 		}
 		return result;
 	}
 	
 	public static Game getGame(String gameId) {
 		return games.get(Integer.valueOf(gameId));
-	}
-	
-	public String getName() {
-		return name;
 	}
 	
 	public void exit() {
@@ -497,16 +514,16 @@ public class Game {
 		int power1 = rateShipPower[l1-1]+type1*3;
 		int power2 = rateShipPower[l2-1]+type2*3;
 		
-		if(type1 == 7 && type2 == 1){
-			if(l1 >= 2 || (l1 == 1 && l2 != 2)){
+		if(type1 == 7 && type2 == 1) {
+			if(l1 >= 2 || (l1 == 1 && l2 != 2)) {
 				power2 = 2;	power1 = 1;
-			}else{
+			} else {
 				power2 = 1;	power1 = 2;
 			}
-		}else if(type1 == 1 && type2 == 7){
-			if(l1 == 2 && l2 == 1){
+		}else if(type1 == 1 && type2 == 7) {
+			if(l1 == 2 && l2 == 1) {
 				power2 = 2;	power1 = 1;
-			}else{
+			} else {
 				power2 = 1;	power1 = 2;
 			}
 		}
@@ -560,7 +577,7 @@ public class Game {
 	private boolean blockIsPossible(Client p, int i, int j) {
 		int t = field[i][j].type;
 		
-		if(t > 7) return false;
+		if(t > 7) return false; // Не боевой корабль
 		
 		if(i-1 >= 0 && field[i-1][j] != null &&
 				field[i-1][j].type == t && field[i-1][j].owner == p) return true;

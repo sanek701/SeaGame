@@ -32,7 +32,7 @@ public class Gui extends JFrame {
 	Game game = null;
 	Ship[][] field = new Ship[15][16];
 	String host=null, port=null;
-	static String[] shipNames = {"","Линкор","Крейсер", "Эсминец","Сторожевик",
+	static String[] shipNames = {"", "Линкор", "Крейсер", "Эсминец", "Сторожевик",
 		"Торпедный катер", "Тральщик", "Подводная лодка",
 		"Форт", "Атомная бомба", "Торпеда", "Мина"};
 	
@@ -146,7 +146,7 @@ public class Gui extends JFrame {
 		bombButton = new JButton("Бомба");
 		bombButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (game.state.toString() == "MOVE") {
+				if (game.state == Game.State.ASK) {
 					game.srv.bomb();
 					bombButton.setVisible(false);
 				} else {
@@ -296,7 +296,7 @@ public class Gui extends JFrame {
 	}
 	
 	private void showGameList() {
-		final String[][] gameList = Connection.getGameList(getHost(), getPort());
+		final String[][] gameList = Connection.getGameList(getHost(), getPort(), this);
 				
 		selectGameFrm = new JFrame("Выбор Игры");
 		selectGameFrm.setSize(400, 25*gameList.length+90);

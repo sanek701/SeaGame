@@ -67,7 +67,7 @@ public class Client implements Runnable {
 			try {
 				cmd = Enum.valueOf(Command.class, args[0]);
 			} catch(Exception e) {
-				//wrong cmd
+				sndMsg("Неверный запрос");
 			}
 			
 			switch(cmd) {

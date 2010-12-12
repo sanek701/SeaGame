@@ -21,15 +21,6 @@ public class Game {
 		}
 	}
 	
-	public void exit() {
-		gui.setGame(null);
-		gui.emptyField();
-		gui.showReadyButton(false);
-		gui.bombButton.setVisible(true);
-		Ship.setGame(null);
-		srv.close();
-	}
-	
 	public void ready() {
 		gui.showReadyButton(false);
 		
@@ -38,6 +29,13 @@ public class Game {
 			gui.showReadyButton(false);
 			srv.ans(Ship.block);
 			Ship.freeBlock();
+		} else if(state == State.ASK) {
+			Ship attacker = Ship.attacker;
+			if(attacker != null) {
+				attacker.selected = false;
+				attacker.repaint();
+				attacker = null;
+			}
 		} else {
 			srv.plReady();
 		}
@@ -82,7 +80,7 @@ public class Game {
 				gui.addMsg("Ваш ход");
 				break;
 			case ASK:
-				gui.addMsg("Ход сделан. Вы можете спросить корабль противника.");
+				gui.addMsg("Вы можете спросить корабль противника.");
 				gui.showReadyButton(true);
 				break;
 			case WAITING:
@@ -100,6 +98,24 @@ public class Game {
 		
 		gui.showReadyButton(true);
 		state = State.ANS;
+	}
+	
+	public void exit() {
+		gui.setGame(null);
+		gui.emptyField();
+		gui.showReadyButton(false);
+		gui.bombButton.setVisible(true);
+		Ship.setGame(null);
+		srv.close();
+	}
+	
+	public void over(boolean win) {
+		state = State.WAITING;
+		if(win) {
+			gui.addMsg("Вы выиграли");
+		} else {
+			gui.addMsg("Вы проиграли");
+		}
 	}
 	
 	public void test(int p) {

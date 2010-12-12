@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class Connection implements Runnable {
 	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL,
-		STATE, READY, MOVE, ASK, ANS, BOMB ,LOOSE, WIN}
+		STATE, READY, MOVE, ASK, ANS, BOMB, NOBOMB, LOOSE, WIN}
 	
 	Socket sock;
 	BufferedReader in;
@@ -18,8 +18,7 @@ public class Connection implements Runnable {
 			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			out = new PrintWriter(sock.getOutputStream(), true);
 		} catch(Exception e) {
-			//("Сервер недоступен");
-			e.printStackTrace();
+			g.gui.addMsg("Сервер недоступен.");
 		}
 		game = g;
 		new Thread(this).start();
@@ -120,9 +119,14 @@ public class Connection implements Runnable {
 					x = Integer.parseInt(args[2]);
 					game.ans(y, x);
 					break;
+				case NOBOMB:
+					game.gui.bombButton.setVisible(false);
+					break;
 				case LOOSE:
+					game.over(false);
 					break;
 				case WIN:
+					game.over(true);
 					break;
 			}
 		}
@@ -133,7 +137,7 @@ public class Connection implements Runnable {
 		try {
 			line = in.readLine().trim();
 		} catch(Exception e) {
-			e.printStackTrace();
+			game.gui.addMsg("Соединение разорвано");
 			game.exit();
 			return null;
 		}
@@ -151,7 +155,7 @@ public class Connection implements Runnable {
 		out.println(s);
 	}
 	
-	public static String[][] getGameList(String host, String port) {
+	public static String[][] getGameList(String host, String port, Gui gui) {
 		Socket s = null;
 		BufferedReader inc = null;
 		PrintWriter outc = null;
@@ -164,7 +168,7 @@ public class Connection implements Runnable {
 			outc.println("GAMELIST;");
 			games = inc.readLine().split(",");
 		} catch(Exception e) {
-			e.printStackTrace();
+			gui.addMsg("Сервер недоступен.");
 		}
 			
 		String[][] gameList = new String[games.length-1][2];
@@ -176,7 +180,7 @@ public class Connection implements Runnable {
 			s.shutdownOutput();
 			s.close();
 		} catch(Exception e) {
-			//неважно
+			// Игнорировать ошибки
 		}
 		
 		return gameList;
@@ -188,7 +192,7 @@ public class Connection implements Runnable {
 			sock.shutdownOutput();
 			sock.close();
 		} catch(Exception e) {
-			// ну и фиг
+			// Игнорировать ошибки
 		}
 	}
 }
