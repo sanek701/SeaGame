@@ -134,8 +134,6 @@ public class Game {
 			 return;
 		 }
 		 
-		 acceptMove(p, i, j, y, x, type);
-		 
 		 if(dist == 1.0) {
 		     if(type == 11 && checkTral(p, i, j, y, x)) {
 		    	 acceptMove(p, i, j, y, x, type);
