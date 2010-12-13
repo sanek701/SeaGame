@@ -5,7 +5,7 @@ import java.util.Map;
 
 
 public class Game {
-	public enum State{NEW, CONNECTED, MOVE, ASK, ANS}
+	public enum State{NEW, CONNECTED, MOVE, ASK, ANS, OVER}
 	static String[] shipNames = {"","Линкор","Крейсер", "Эсминец","Сторожевик",
 		"Торпедный катер", "Тральщик", "Подводная лодка",
 		"Форт", "Атомная бомба", "Торпеда", "Мина"};
@@ -135,7 +135,7 @@ public class Game {
 		 }
 		 
 		 acceptMove(p, i, j, y, x, type);
-		 /* for testing purposes
+		 
 		 if(dist == 1.0) {
 		     if(type == 11 && checkTral(p, i, j, y, x)) {
 		    	 acceptMove(p, i, j, y, x, type);
@@ -156,7 +156,6 @@ public class Game {
 		 } else {
 				 p.sndMsg("Неверный ход");
 		 }
-		 */
 	}
 	
 	private void acceptMove(Client p, int i, int j, int y, int x, int type) {	
@@ -276,12 +275,14 @@ public class Game {
 			if(forts[0] == 0) {
 				p2.write("WIN");
 				p1.write("LOOSE");
+				state = State.OVER;
 			}
 		} else {
 			forts[1] -= 1;
 			if(forts[1] == 0) {
 				p1.write("WIN;");
 				p2.write("LOOSE;");
+				state = State.OVER;
 			}
 		}
 	}
@@ -451,8 +452,8 @@ public class Game {
 		
 		p.write("NOBOMB;"); // Убрать кнопку взрыва бомбы у игрока
 		
-		p.deleteShip(p.y(bi), bj);
-		op.deleteShip(op.y(bi), bj);
+		p.deleteShip(bi, bj);
+		op.deleteShip(bi, bj);
 		field[bi][bj] = null;
 			
 		top    = bi-2;
@@ -471,7 +472,7 @@ public class Game {
 					if(field[k][t].type == 9) { // Атомная бомба
 						proceedBomb(op);
 					} else {
-						p.deleteShip(k,t);
+						p.deleteShip(k, t);
 						op.deleteShip(k, t);
 						if(field[k][t].owner == p) {
 							op.sndMsg("Взорвался " + shipNames[field[k][t].type]);

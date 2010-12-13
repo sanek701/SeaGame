@@ -15,6 +15,8 @@ import java.awt.Image;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.FileWriter;
@@ -23,7 +25,8 @@ import java.io.IOException;
 
 public class Gui extends JFrame {
 	private static final long serialVersionUID = 1L;
-	JFrame newGameFrm, selectGameFrm, setHostFrm, errorFrm, createShipFrm=null, deleteShipFrm=null;
+	JFrame newGameFrm, selectGameFrm, setHostFrm,
+		errorFrm, createShipFrm=null, deleteShipFrm=null, overGame;
 	JLabel errorLbl;
 	JTextArea msgBox;
 	JScrollPane spane;
@@ -47,6 +50,7 @@ public class Gui extends JFrame {
 		msgBox = new JTextArea();
 		msgBox.setEditable(false);
 		msgBox.setLineWrap(true);
+		msgBox.setFocusable(false);
 		spane = new JScrollPane(msgBox, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		spane.setBounds(615, 570, 165, 250);
 		add(spane);
@@ -125,6 +129,7 @@ public class Gui extends JFrame {
 		test = new JButton("Player1");
 		test.setBounds(660, 300, 100, 26);
 		test.setVisible(true);
+		test.setFocusable(false);
 		test.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				game.test(1);
@@ -140,8 +145,18 @@ public class Gui extends JFrame {
 			}
 		});
 		ready.setBounds(615, 50, 165, 25);
+		ready.setFocusable(false);
 		ready.setVisible(false);
 		add(ready);
+		
+		KeyAdapter kd = new KeyAdapter(){
+			public void keyTyped(KeyEvent e) {
+				if(e.getKeyChar()=='\n' && game!=null)
+					game.ready();
+			}
+		};
+		addKeyListener(kd);
+		setFocusable(true);
 		
 		bombButton = new JButton("Бомба");
 		bombButton.addActionListener(new ActionListener() {
@@ -155,6 +170,7 @@ public class Gui extends JFrame {
 			}
 		});
 		bombButton.setBounds(615, 100, 165, 25);
+		bombButton.setFocusable(false);
 		bombButton.setVisible(true);
 		add(bombButton);
 		
@@ -299,7 +315,7 @@ public class Gui extends JFrame {
 		final String[][] gameList = Connection.getGameList(getHost(), getPort(), this);
 				
 		selectGameFrm = new JFrame("Выбор Игры");
-		selectGameFrm.setSize(400, 25*gameList.length+90);
+		selectGameFrm.setSize(400, 25*gameList.length+60);
 		
 		selectGameFrm.add(new JLabel("Ваше Имя"));
 		final JTextField pName = new JTextField("Игрок", 17);
@@ -324,17 +340,22 @@ public class Gui extends JFrame {
 			selectGameFrm.getContentPane().add(rb[i]);
 		}
 		
-		JButton newGame = new JButton("Создать Игру");
-		newGame.addActionListener(new ActionListener() {
+		selectGameFrm.setVisible(true);
+	}
+	
+	public void showInfoWindow(String text) {
+		final JFrame fr = new JFrame("Ифнормация");
+		fr.setSize(150, 100);
+		fr.setLayout(new FlowLayout());
+		fr.add(new JLabel(text));
+		JButton ok = new JButton("Закрыть");
+		ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
-				if(game!=null) game.exit();
-				showCreateGame();
-				selectGameFrm.setVisible(false);
+				fr.setVisible(false);
 			}
 		});
-		
-		selectGameFrm.add(newGame);
-		selectGameFrm.setVisible(true);
+		fr.add(ok);
+		fr.setVisible(true);
 	}
 
 	private void saveChanges(String hostNew, String portNew) {

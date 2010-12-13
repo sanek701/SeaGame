@@ -22,6 +22,7 @@ public class Game {
 	}
 	
 	public void ready() {
+		if(!gui.ready.isVisible()) return;
 		gui.showReadyButton(false);
 		
 		if(state == State.ANS) {
@@ -36,6 +37,7 @@ public class Game {
 				attacker.repaint();
 				attacker = null;
 			}
+			srv.plReady();
 		} else {
 			srv.plReady();
 		}
@@ -112,9 +114,9 @@ public class Game {
 	public void over(boolean win) {
 		state = State.WAITING;
 		if(win) {
-			gui.addMsg("Вы выиграли");
+			gui.showInfoWindow("Вы выиграли");
 		} else {
-			gui.addMsg("Вы проиграли");
+			gui.showInfoWindow("Вы проиграли");
 		}
 	}
 	

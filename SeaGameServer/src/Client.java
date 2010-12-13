@@ -34,7 +34,6 @@ public class Client implements Runnable {
 		try{
 			line = in.readLine().trim();
 		} catch(Exception e) {
-			e.printStackTrace();
 			if(game!=null) game.exit();
 			return null;
 		}
@@ -123,6 +122,7 @@ public class Client implements Runnable {
 	}
 	
 	public void setState(String st) {
+		if(game!=null && game.state==Game.State.OVER) return;
 		write("STATE;"+st+";");
 	}
 	
@@ -133,7 +133,7 @@ public class Client implements Runnable {
 			sock.shutdownOutput();
 			sock.close();
 		} catch(Exception e) {
-			// игнорим
+				// Игнорировать ошибки
 		}
 	}
 }
