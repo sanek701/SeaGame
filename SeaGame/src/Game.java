@@ -25,6 +25,8 @@ public class Game {
 		if(!gui.ready.isVisible()) return;
 		gui.showReadyButton(false);
 		
+		if(state == State.CREATESHIPS)
+			gui.bombButton.setVisible(true);
 		if(state == State.ANS) {
 			state = State.WAITING;
 			gui.showReadyButton(false);
@@ -41,6 +43,7 @@ public class Game {
 		} else {
 			srv.plReady();
 		}
+		
 	}
 	
 	public void createShip(int x, int y, int type) {
@@ -77,6 +80,7 @@ public class Game {
 		switch(state) {
 			case CREATESHIPS:
 				gui.addMsg("Расставьте свои корабли");
+		
 				break;
 			case MOVE:
 				gui.addMsg("Ваш ход");
@@ -106,7 +110,8 @@ public class Game {
 		gui.setGame(null);
 		gui.emptyField();
 		gui.showReadyButton(false);
-		gui.bombButton.setVisible(true);
+		gui.bombButton.setVisible(false);
+		gui.msgBox.setText("");
 		Ship.setGame(null);
 		srv.close();
 	}

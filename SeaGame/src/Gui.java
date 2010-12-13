@@ -26,7 +26,7 @@ import java.io.IOException;
 public class Gui extends JFrame {
 	private static final long serialVersionUID = 1L;
 	JFrame newGameFrm, selectGameFrm, setHostFrm,
-		errorFrm, createShipFrm=null, deleteShipFrm=null, overGame;
+		createShipFrm=null, deleteShipFrm=null;
 	JLabel errorLbl;
 	JTextArea msgBox;
 	JScrollPane spane;
@@ -85,6 +85,8 @@ public class Gui extends JFrame {
 		i3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(game!=null) game.exit();
+				msgBox.setText("");
+				bombButton.setVisible(false);
 			}
 		});
 		
@@ -135,7 +137,7 @@ public class Gui extends JFrame {
 				game.test(1);
 			}
 		});
-		add(test);
+//		add(test);
 		//---------------------END TEMP-----------------
 		
 		ready = new JButton("Завершить");
@@ -171,7 +173,7 @@ public class Gui extends JFrame {
 		});
 		bombButton.setBounds(615, 100, 165, 25);
 		bombButton.setFocusable(false);
-		bombButton.setVisible(true);
+		bombButton.setVisible(false);
 		add(bombButton);
 		
 		importImages();
@@ -264,11 +266,6 @@ public class Gui extends JFrame {
 		msgBox.setCaretPosition(msgBox.getDocument().getLength());
 	}
 	
-	public void showError(String s) {
-		errorLbl.setText(s);
-		errorFrm.setVisible(true);
-	}
-	
 	public void setGame(Game g) {
 		game = g;
 	}
@@ -290,7 +287,7 @@ public class Gui extends JFrame {
 	
 	private void showCreateGame() {
 		newGameFrm = new JFrame("Создание Игры");
-		newGameFrm.setSize(400, 300);
+		newGameFrm.setSize(400, 175);
 		newGameFrm.setLayout(new FlowLayout());
 		newGameFrm.add(new JLabel("Название Игры"));
 		final JTextField gName = new JTextField("Моя игра", 32);

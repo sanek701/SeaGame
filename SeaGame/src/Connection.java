@@ -141,7 +141,7 @@ public class Connection implements Runnable {
 			game.exit();
 			return null;
 		}
-		System.out.println("<- "+line); //debug
+//		System.out.println("<- "+line); //debug
 		return line;
 	}
 	
@@ -151,7 +151,7 @@ public class Connection implements Runnable {
 			for(int i=0; i<args.length; i++)	// join args with ';'
 				s += args[i]+";";
 
-		System.out.println("-> "+s); //debug
+//		System.out.println("-> "+s); //debug
 		out.println(s);
 	}
 	

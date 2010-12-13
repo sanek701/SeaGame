@@ -43,8 +43,9 @@ public class Game {
 		if(p2!=null) return null; //Player already exists
 		p2 = p;
 		p2.setPlayer(2, pName);
-		p1.sndMsg("Player "+pName+" joined the game.");
-		p2.sndMsg("Welcome to "+name+"("+p1.playerName+").");
+		p1.sndMsg(pName+" присоединился к игре.");
+		p2.sndMsg("Вы присоединились к игре "+name);
+		p2.sndMsg("Ваш противник: "+p1.playerName+".");
 		state = State.CONNECTED;
 		p1.setState("CREATESHIPS");
 		p2.setState("CREATESHIPS");
@@ -222,6 +223,7 @@ public class Game {
 			p.deleteShip(y, x);
 			op.deleteShip(y, x);
 			killFort(p);
+			field[y][x] = null;
 			changeOrder(false);
 			return;
 		}
@@ -311,7 +313,7 @@ public class Game {
 		int attackerLength = findBlock(opponent(p), i, j, 0);
 		int result = compareBlocks(attackerLength, field[i][j].type, defenders.length, field[y][x].type);
 		
-		opponent(p).sndMsg("Это " + Integer.toString(defenders.length)+ shipNames[field[y][x].type]);
+		opponent(p).sndMsg("Это " + Integer.toString(defenders.length)+" " +shipNames[field[y][x].type]);
 		
 		switch(result) { //что когда делаем
 			case 1: //win
