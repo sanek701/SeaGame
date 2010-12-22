@@ -15,6 +15,7 @@ public class Game {
 	static int gameCount = 0;
 	private static int[] rateShipPower = {3, -2 , -4}; //магические чиселки для вычисления мощности блока
 	private int[] forts = {2, 2};
+	private int[] warShips = {38, 38};
 	
 	Client p1=null, p2=null;
 	public String name;
@@ -25,13 +26,14 @@ public class Game {
 	int order = 0;
 	int[] atdef = new int[4];
 	int[][] attackers = new int[3][2];
-	
+
 	public Game(Client p, String pName, String gName) {
 		name = gName;
 		p1 = p;
 		p1.setPlayer(1, pName);
 		gameCount += 1;
 		id = gameCount;
+		warShips[0] = 38; warShips[1]=38;
 		games.put(id, this);
 	}
 	
@@ -68,7 +70,7 @@ public class Game {
 	
 	public void deleteShip(Client p, int i, int j) {
 		if(state!=State.CONNECTED) return;
-		
+
 		i = p.y(i);
 		if(field[i][j].owner == p) {
 			field[i][j] = null;
@@ -76,7 +78,7 @@ public class Game {
 			opponent(p).deleteShip(i, j);
 		} else {
 			p.setShip(i, j, 0);
-		}
+		}	
 	}
 	
 	public void proceedReady(Client p) {
@@ -135,6 +137,9 @@ public class Game {
 			 return;
 		 }
 		 
+		 /*acceptMove(p,i,j,y,x,type);
+		 return;*/
+		 
 		 if(dist == 1.0) {
 		     if(type == 11 && checkTral(p, i, j, y, x)) {
 		    	 acceptMove(p, i, j, y, x, type);
@@ -156,7 +161,7 @@ public class Game {
 				 p.sndMsg("Неверный ход");
 		 }
 	}
-	
+	 
 	private void acceptMove(Client p, int i, int j, int y, int x, int type) {	
 		p.setShip(y, x, type);
 		opponent(p).setShip(y, x, 0);
@@ -191,39 +196,28 @@ public class Game {
 		} else if (field[i][j].type == 10 || field[y][x].type == 10) { //Спросили торпеду или торпедой
 			if(field[y][x].type == 8) { //спросили форт торпедой
 				p.sndMsg("Вы нашли форт противника (" + Integer.toString(y)+","+Integer.toString(x)+")");
-				field[i][j] = null;
-				p.deleteShip(i, j);
-				op.deleteShip(i, j);
+				killShip(p, i, j);
 				changeOrder(false);
 			} else { // Торпедой спросили торпеду
-				field[y][x] = null;
-				p.deleteShip(y, x);
-				op.deleteShip(y, x);
-				field[i][j] = null;
-				p.deleteShip(i, j);
-				op.deleteShip(i, j);
+				killShip(p, y, x);
+				killShip(p, i, j);
 				changeOrder(true);
 			}
 			return;
 		} else if (field[y][x].type == 11) { // Спросили мину
 			p.sndMsg("Это МИНА");
 			if (field[i][j].type == 6) { // Тральщик спросил мину, снимает ее с поля
-				field[y][x] = null;
-				p.deleteShip(y, x);
-				op.deleteShip(y, x);
+				killShip(p, y, x);
 				changeOrder(false);
 			} else { // Спросивший корабль подорвался на мине
-				field[i][j] = null;
-				p.deleteShip(i, j);
-				op.deleteShip(i, j);
+				killShip(p, i, j);
+				killShip(p, y, x);
 				changeOrder(true);
 			}
 			return;
 		} else if(field[y][x].type == 8) { //Cпросили форт боевым кораблем
-			p.deleteShip(y, x);
-			op.deleteShip(y, x);
+			killShip(p, y, x);
 			killFort(p);
-			field[y][x] = null;
 			changeOrder(false);
 			return;
 		}
@@ -246,24 +240,16 @@ public class Game {
 		p.sndMsg("Это " + shipNames[field[y][x].type]);
 		switch(result) { // что когда делаем
 			case 1: //win
-				field[y][x] = null;
-				p.deleteShip(y, x);
-				opponent(p).deleteShip(y, x);
+				killShip(p, y, x);
 				changeOrder(false);
 				break;
 			case -1: //loss
-				field[i][j] = null;
-				p.deleteShip(i, j);
-				opponent(p).deleteShip(i, j);
+				killShip(p, i, j);
 				changeOrder(true);
 				break;
 			case 0: //equal
-				field[y][x] = null;
-				p.deleteShip(y, x);
-				opponent(p).deleteShip(y, x);
-				field[i][j] = null;
-				p.deleteShip(i, j);
-				opponent(p).deleteShip(i, j);
+				killShip(p, y, x);
+				killShip(p, i, j);
 				changeOrder(true);
 				break;
 		}
@@ -287,6 +273,43 @@ public class Game {
 		}
 	}
  
+	
+	private void killShip(Client p, int i, int j){
+		if(state!=State.ASK && state!=State.ANS) return;
+		
+		if(field[i][j] == null) return;
+		
+		if(field[i][j].type < 8 || field[i][j].type == 9){
+			if( field[i][j].owner == p1){
+				warShips[0]-=1;
+			}else{
+				warShips[1]-=1;
+			}
+		}
+		
+		if(warShips[0]==0 && warShips[1]==0){
+			p1.write("DRAW");
+			p2.write("DRAW");
+			state = State.OVER;
+			return;
+		}else if(warShips[0]==0){
+			p1.write("LOOSE");
+			p2.write("WIN");
+			state = State.OVER;
+			return;
+		}else if(warShips[1]==0){
+			p2.write("LOOSE");
+			p1.write("WIN");
+			state = State.OVER;
+			return;
+		}
+		
+		field[i][j] = null;
+		p.deleteShip(i, j);
+		opponent(p).deleteShip(i, j);
+			
+	}
+	
 	public void ans(Client p, String[] block) {
 		int k, i, j, x, y;
 		String[] sh;
@@ -321,9 +344,7 @@ public class Game {
 				changeOrder(false);
 				break;
 			case -1: //loss
-				field[i][j] = null;
-				p.deleteShip(i, j);
-				opponent(p).deleteShip(i, j);
+				killShip(p, i, j);
 				changeOrder(true);
 				break;
 			case 0: //equal
@@ -359,10 +380,11 @@ public class Game {
 	}
 	
 	private boolean IsBlockCorrect(int[][] block) {
+		
 		if(block[0][0] == atdef[2] && block[0][0] == atdef[3]) {
 			return false;
 		}
-		
+
 		switch(block.length) {
 			case 1:
 				return true;
@@ -423,9 +445,9 @@ public class Game {
 	
 	private void deleteBlock(int[][] block, int len) {
 		 for(int k = 0; k < len; k++) {
-		 	field[block[k][0]][block[k][1]] = null;
-			p1.deleteShip(block[k][0],block[k][1]);
-			p2.deleteShip(block[k][0],block[k][1]);
+		 	//field[block[k][0]][block[k][1]] = null;
+			killShip(p1, block[k][0],block[k][1]);
+			//p2.deleteShip(block[k][0],block[k][1]);
 		 }
 	}
 	
@@ -452,9 +474,7 @@ public class Game {
 		
 		p.write("NOBOMB;"); // Убрать кнопку взрыва бомбы у игрока
 		
-		p.deleteShip(bi, bj);
-		op.deleteShip(bi, bj);
-		field[bi][bj] = null;
+		killShip(p, bi, bj);
 			
 		top    = bi-2;
 		bottom = bi+2;
@@ -472,8 +492,7 @@ public class Game {
 					if(field[k][t].type == 9) { // Атомная бомба
 						proceedBomb(op);
 					} else {
-						p.deleteShip(k, t);
-						op.deleteShip(k, t);
+						
 						if(field[k][t].owner == p) {
 							op.sndMsg("Взорвался " + shipNames[field[k][t].type]);
 						} else {
@@ -481,7 +500,7 @@ public class Game {
 						}
 						if(field[k][t].type == 8) // Форт
 							killFort(field[k][t].owner);
-						field[k][t] = null;
+						killShip(p, k, t);
 					}
 				}
 			}

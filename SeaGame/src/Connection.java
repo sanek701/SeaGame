@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class Connection implements Runnable {
 	public enum Command {BAD, NEW, JOIN, MSG, QUIT, SET, DEL,
-		STATE, READY, MOVE, ASK, ANS, BOMB, NOBOMB, LOOSE, WIN}
+		STATE, READY, MOVE, ASK, ANS, BOMB, NOBOMB, LOOSE, WIN, DRAW}
 	
 	Socket sock;
 	BufferedReader in;
@@ -123,10 +123,13 @@ public class Connection implements Runnable {
 					game.gui.bombButton.setVisible(false);
 					break;
 				case LOOSE:
-					game.over(false);
+					game.over(-1);
 					break;
 				case WIN:
-					game.over(true);
+					game.over(1);
+					break;
+				case DRAW:
+					game.over(0);
 					break;
 			}
 		}

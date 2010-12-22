@@ -116,12 +116,14 @@ public class Game {
 		srv.close();
 	}
 	
-	public void over(boolean win) {
+	public void over(int win) {
 		state = State.WAITING;
-		if(win) {
+		if(win == 1) {
 			gui.showInfoWindow("Вы выиграли");
-		} else {
+		} else if(win == -1) {
 			gui.showInfoWindow("Вы проиграли");
+		} else {
+			gui.showInfoWindow("Победила дружба!");
 		}
 	}
 	
