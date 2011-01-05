@@ -51,6 +51,8 @@ public class Game {
 		state = State.CONNECTED;
 		p1.setState("CREATESHIPS");
 		p2.setState("CREATESHIPS");
+		if(games.containsKey(id))
+			games.remove(id);
 		return this;
 	}
 	

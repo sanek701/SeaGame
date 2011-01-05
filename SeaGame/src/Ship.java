@@ -14,6 +14,7 @@ public class Ship extends JComponent {
 	static Ship attacker = null;
 	int x, y, type;
 	boolean selected;
+	static int coef = Gui.coef;
 	
 	public Ship(int t, int i, int j) {
 		y = i;
@@ -98,13 +99,13 @@ public class Ship extends JComponent {
 		if(y>=5) g.setColor(Color.black);
 		if(y>=10) g.setColor(Color.blue);
 		if(type!=-1) {
-			g.drawImage(lib[type], 1, 1, 34, 52, this);
+			g.drawImage(lib[type], 1, 1, 34/coef, 52/coef, this);
 		}
 		if(selected) {
 			g.setColor(Color.red);
-			g.drawRect(1, 1, 34, 54);
+			g.drawRect(1, 1, 34/coef, 54/coef);
 		} else {
-			g.drawRect(0, 0, 34, 54);
+			g.drawRect(0, 0, 34/coef, 54/coef);
 		}
 		g.setColor(c);
 		super.paint(g);
@@ -159,5 +160,9 @@ public class Ship extends JComponent {
 				block[i] = null;
 			}
 		}
+	}
+	
+	public static void updateCoef() {
+		coef = Gui.coef;
 	}
 }

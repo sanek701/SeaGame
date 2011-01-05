@@ -26,7 +26,7 @@ import java.io.IOException;
 public class Gui extends JFrame {
 	private static final long serialVersionUID = 1L;
 	JFrame newGameFrm, selectGameFrm, setHostFrm,
-		createShipFrm=null, deleteShipFrm=null;
+		createShipFrm=null, deleteShipFrm=null, coefFrm=null;
 	JLabel errorLbl;
 	JTextArea msgBox;
 	JScrollPane spane;
@@ -38,6 +38,7 @@ public class Gui extends JFrame {
 	static String[] shipNames = {"", "Линкор", "Крейсер", "Эсминец", "Сторожевик",
 		"Торпедный катер", "Тральщик", "Подводная лодка",
 		"Форт", "Атомная бомба", "Торпеда", "Мина"};
+	static int coef = 1;
 	
 	public Gui() {
 		super("Sea Game");
@@ -60,12 +61,13 @@ public class Gui extends JFrame {
 		JMenu m1 = new JMenu("Игра");
 		JMenu m2 = new JMenu("Настройки");
 		
-		JMenuItem i1, i2, i3, i4, i5;
+		JMenuItem i1, i2, i3, i4, i5, i6;
 		m1.add(i1 = new JMenuItem("Новая"));
 		m1.add(i2 = new JMenuItem("Присоединиться"));
 		m1.add(i3 = new JMenuItem("Закончить игру"));
 		m1.add(i4 = new JMenuItem("Выйти"));
 		m2.add(i5 = new JMenuItem("Настройки подключения"));
+		m2.add(i6 = new JMenuItem("Размер окна"));
 		mbar.add(m1);
 		mbar.add(m2);
 		setJMenuBar(mbar);
@@ -127,6 +129,13 @@ public class Gui extends JFrame {
 				setHostFrm.setVisible(true);
 			}
 		});
+		
+		i6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showCoefMenu();
+			}
+		});
+		
 		//---------------------TEMP---------------------
 		test = new JButton("Player1");
 		test.setBounds(660, 300, 100, 26);
@@ -393,5 +402,62 @@ public class Gui extends JFrame {
 			}
 		}
 		return port;
+	}
+	
+	public void showCoefMenu() {
+		if(coefFrm != null) coefFrm.setVisible(false);
+		coefFrm = new JFrame("Масштаб");
+		coefFrm.setBounds(150,300,250,120);
+		coefFrm.setLayout(new FlowLayout());
+		JLabel lab1 = new JLabel("Уменьшить поле в \n");
+		JLabel lab2 = new JLabel("раза. (только целые числа!)");
+		coefFrm.add(lab1);
+		JButton  ok = new JButton("Ok");
+		JButton  cansel = new JButton("Отмена");
+		final JTextField coeff = new JTextField("1", 5);
+		
+		ok.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				setCoef(Integer.parseInt(coeff.getText()));
+				coefFrm.setVisible(false);
+			}
+		});
+		
+		cansel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				coefFrm.setVisible(false);
+			}
+		});
+		
+		coefFrm.add(lab1);
+		coefFrm.add(coeff);
+		coefFrm.add(lab2);
+		coefFrm.add(ok);
+		coefFrm.add(cansel);
+		coefFrm.setVisible(true);
+	}
+	
+	public void setCoef(int i) {
+		if (i!=0) coef = i;
+		setSize(800/coef, 940/coef);
+		Ship.updateCoef();		
+		updateField();
+		ready.setBounds(660/coef, 20/coef, 100/coef, 26/coef);
+		bombButton.setBounds(660/coef, 50/coef, 100/coef, 26/coef);
+		spane.setBounds(620/coef, 550/coef, 155/coef, 270/coef);
+		//tmp
+		test.setBounds(660/coef, 300/coef, 100/coef, 26/coef);
+		//
+		
+	}
+	
+	public void updateField() {
+		int i, j;
+		for(i=0; i<15; i++) {
+			for(j=0; j<16; j++) {
+				field[i][j].setBounds(j*36/coef+30/coef, i*54/coef+16/coef, 36/coef+1, 54/coef+1);
+				field[i][j].repaint();
+			}
+		}
 	}
 }
